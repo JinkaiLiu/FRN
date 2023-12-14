@@ -71,7 +71,7 @@ def setup_arg_parser():
     parser.add_argument('--csv_val', help='Path to file containing validation annotations (optional, see readme)')
     parser.add_argument('--root_img',default=f'{base_dir}/train/transformed_images',help='dir to root rgb images in dsec format')
     parser.add_argument('--root_event', default=f'{base_dir}/train/events',help='dir to toot event files in dsec directory structure')
-    parser.add_argument('--fusion', help='Type of fusion:1)early, fpn_fusion, multi-level', type=str, default='fpn_fusion')
+    parser.add_argument('--fusion', help='fpn_fusion, rgb, event', type=str, default='fpn_fusion')
     parser.add_argument('--checkpoint', help='location of pretrained file', default='../best_epoch.pt')
     parser.add_argument('--csv_test', default=f'{base_dir}/DSEC_detection_labels/labels_filtered_test.csv',
                         help='Path to file containing training annotations (see readme)')
@@ -87,8 +87,6 @@ def main(args=None):
     parser = setup_arg_parser()
     args = parser.parse_args(args)
     
-    print('Early fusion homograsphic rgb event gray,check channels(gray,events), change the cooruption image folder and in test img folder(above), change the save-detect folder')
-
     # Load training dataset
     dataset_train, dataloader_train = create_dataset_and_loader(args.dataset_name, args.csv_train, args.csv_classes, 
                                                                 args.root_event, args.root_img, 
@@ -135,8 +133,7 @@ def main(args=None):
             for severity in severity_list:
                 corruption_folder = f'/media/data/hucao/zhenwu/hucao/DSEC/corruptions/{corruption}/severity_{severity}'
                 save_detect_folder = os.path.join(root_save_detect_folder,f'{parser.fusion}_{parser.event_type}',corruption,f'severity_{severity}')
-                #save_detect_folder = os.path.join('/home/abhishek/save_detection/early_homography_voxel',corruption,f'severity_{severity}')
-                
+            
                 os.makedirs(save_detect_folder,exist_ok=True)  
                 args.root_img = corruption_folder
 
@@ -194,7 +191,7 @@ def main(args=None):
         start = time.time()
         # print(f'sensor fusion, {corruption}')
         save_detect_folder = os.path.join(root_save_detect_folder,f'{args.fusion}_{args.event_type}','evaluation')
-        #save_detect_folder = '/home/abhishek/save_detection/early_homography_voxel/evaluation'
+        
         os.makedirs(save_detect_folder,exist_ok=True)
         if coco:
             mAP = csv_eval.evaluate_coco_map(dataset_val1, retinanet,save_detection = False,save_folder = save_detect_folder,

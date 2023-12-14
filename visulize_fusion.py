@@ -139,7 +139,7 @@ if __name__ == '__main__':
     # parser.add_argument('--image_dir', default= f'{base_dir}/train/transformed_images/zurich_city_01_e/images/left',help='Path to directory containing images')
     parser.add_argument('--class_list', default=f'{base_dir}/DSEC_detection_labels/labels_filtered_map.csv',help='Path to CSV file listing class names (see README)')
     parser.add_argument('--depth', help='Resnet depth, must be one of 18, 34, 50, 101, 152', type=int, default=50)
-    parser.add_argument('--fusion', help='Type of fusion:1)early, fpn_fusion, multi-level', type=str,default='fpn_fusion')
+    parser.add_argument('--fusion', help='fpn_fusion, rgb, event', type=str,default='fpn_fusion')
     # parser.add_argument('--csv_train', default=f'{base_dir}/DSEC_detection_labels/labels_filtered_train.csv',help='Path to file containing training annotations (see readme)')
     parser.add_argument('--root_img', default=f'{base_dir}/train/transformed_images', help='dir to toot rgb images in dsec format')
     parser.add_argument('--model_path', default='/media/data/hucao/zehua/results_dsec/cross_4layer/csv_fpn_homographic_retinanet_retinanet101_38.pt', help='Path to model')
