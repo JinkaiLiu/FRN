@@ -65,10 +65,6 @@ def main(args=None):
         
         dataset_train = CSVDataset_event(dataset_name=parser.dataset_name, train_file=parser.csv_train, class_list=parser.csv_classes,root_event_dir=parser.root_event,root_img_dir=parser.root_img,
                                          transform=transforms.Compose([Normalizer(dataset_name=parser.dataset_name), Resizer(dataset_name=parser.dataset_name)]))
-        #train_file (string): CSV file with training annotations
-        #annotations (string): CSV file with class list
-        #test_file (string, optional): CSV file with testing annotations
-
         if parser.csv_val is None:
             dataset_val = None
             print('No validation annotations provided.')
