@@ -689,10 +689,6 @@ def resnet34(num_classes, pretrained=False, **kwargs):
 
 def resnet50(dataset_name, num_classes, fusion_model, pretrained=False, **kwargs):
     """Constructs a ResNet-50 model.
-    Args:
-        pretrained (bool): If True, returns a model pre-trained on ImageNet 是一个数据集
-       #Bottleneck为基础，每个module中Bottleneck中的数量为[3, 4, 6, 3]
-       #model返回为FPN输出的多尺度特征图
     """
     if fusion_model == 'fpn_fusion':
         model = ResNet_fpn_fusion(dataset_name, num_classes, event_block=Bottleneck, rgb_block=Bottleneck, event_layers=[3, 4, 6, 3],rgb_layers=[3, 4, 6, 3], **kwargs)
