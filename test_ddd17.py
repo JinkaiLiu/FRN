@@ -46,16 +46,13 @@ def main(args=None):
     parser.add_argument('--csv_val', help='Path to file containing validation annotations (optional, see readme)')
     parser.add_argument('--root_img',default='/media/data/hucao/zhenwu/hucao/PKU-DDD17_all/images/test_all/aps_images',help='dir to root rgb images in dsec format')
     parser.add_argument('--root_event', default='/media/data/hucao/zhenwu/hucao/PKU-DDD17_all/images/test_all/dvs_events',help='dir to toot event files in dsec directory structure')
-    parser.add_argument('--fusion', help='Type of fusion:1)early, fpn_fusion, multi-level', type=str, default='fpn_fusion')
+    parser.add_argument('--fusion', help='fpn_fusion, rgb, event', type=str, default='fpn_fusion')
     parser.add_argument('--checkpoint', help='location of pretrained file', default='/media/data/hucao/zehua/results_ddd17_day/ablation/final/csv_fpn_homographic_retinanet_retinanet101_161.pt')
     parser.add_argument('--csv_test', default='/media/data/hucao/zhenwu/hucao/PKU-DDD17_all/annotations_CSV/labels_filtered_test_all.csv',
                         help='Path to file containing training annotations (see readme)')
     parser.add_argument('--eval_corruption', help='evaluate on the coorupted images', type=bool, default=False)
     parser.add_argument('--corruption_group', help='corruption group number', type=int, default=0)
     parser.add_argument('--event_type', help='voxel or gray', type=str, default='voxel')
-    
-   
-    print('Early fusion homograsphic rgb event gray,check channels(gray,events), change the cooruption image folder and in test img folder(above), change the save-detect folder')
 
 
     parser = parser.parse_args(args)
@@ -65,7 +62,7 @@ def main(args=None):
     
     
     # Create the model
-    list_models = ['early_fusion', 'fpn_fusion', 'event', 'rgb']
+    list_models = ['fpn_fusion', 'event', 'rgb']
     if parser.fusion in  list_models:
         retinanet = model.resnet50(dataset_name=parser.dataset_name, num_classes=dataset_train.num_classes(),fusion_model=parser.fusion,pretrained=False)
     else:

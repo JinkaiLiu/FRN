@@ -45,7 +45,7 @@ def main(args=None):
     parser.add_argument('--csv_val', help='Path to file containing validation annotations (optional, see readme)') 
     parser.add_argument('--root_img',default=f'{base_dir}/train/transformed_images',help='dir to root rgb images') 
     parser.add_argument('--root_event', default=f'{base_dir}/train/events',help='dir to toot event files in dsec directory structure')
-    parser.add_argument('--fusion', help='Tfpn_fusion, rgb, event', type=str, default='fpn_fusion')
+    parser.add_argument('--fusion', help='fpn_fusion, rgb, event', type=str, default='fpn_fusion')
     parser.add_argument('--depth', help='Resnet depth, must be one of 18, 34, 50', type=int, default=50) 
     parser.add_argument('--epochs', help='Number of epochs', type=int, default=60) 
     parser.add_argument('--continue_training', help='load a pretrained file', default=True) 
