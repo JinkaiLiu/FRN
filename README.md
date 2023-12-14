@@ -6,10 +6,9 @@ The official implementation for "Embracing Events and Frames with Hierarchical F
 ![output_evt](https://github.com/HuCaoFighting/FRN/assets/66437581/f8e54dda-c623-4fda-91af-012fe24c22fe)
 
 ## Setup
+- Setup python environment
 
 This code has been tested with Python 3.8, Pytorch 2.0.1, and on Ubuntu 20.04
-
-- Setup python environment
 
 We recommend you to use Anaconda to create a conda environment:
 
