@@ -33,9 +33,9 @@ python train_dsec.py
 python train_ddd17.py
 ```
 ### Evaluation
-You can download our pretrained weights below and modify the path of checkpoint in test.py file.
+You can download our pretrained weights below and modify the path of checkpoint in test_dsec.py file.
 ```
-python test.py
+python test_dsec.py
 ```
 For PKU-DDD17 Dataset
 ```
