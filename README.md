@@ -44,7 +44,7 @@ python test_ddd17.py
 
 ## Pre-trained Weights
 
-Our pre-trained weights can be downloaded [here](https://drive.google.com/file/d/1g_AwWsOJHljpQYIpaeAN8YvYWh0pouaV/view?usp=sharing)
+Our pre-trained weights can be downloaded [dsec](https://drive.google.com/file/d/1g_AwWsOJHljpQYIpaeAN8YvYWh0pouaV/view?usp=sharing) and [ddd17](https://drive.google.com/file/d/1DvmZNCQeHjORzoplOYho7GifkpeOdNZ2/view?usp=sharing)
 
 ## Results COCO mAP@0.50.95 on DSEC 
 
