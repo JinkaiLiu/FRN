@@ -66,8 +66,8 @@ Our pre-trained weights can be downloaded [dsec](https://drive.google.com/file/d
 | Ours               | **0.499**   | **0.258**      | **0.382**            | **0.380**       |
 
 ## Results COCO mAP@0.50.95 on DDD17
-| Method                    | Test(allday) | Test(day) | Test(night) |
-| ------------------------- | ------------ | --------- | ----------- |
+| Method                    | Test(all) mAP@0.50.95 | Test(day) mAP@0.50.95 | Test(night) mAP@0.50.95 | Test(all) mAP@0.50 | Test(day) mAP@0.50 | Test(night) mAP@0.50 |
+| ------------------------- | ------------ | --------- | ----------- |----------------------- | ------------------ | ------------------ | -------------------- |
 | OnlyRGB                   | 0.427          | 0.433      | 0.406          | 0.827         | 0.829        | 0.825          |
 | OnlyEvent                 | 0.215        | 0.214     | 0.243       |0.465        | 0.436     | 0.600       |
 | FPN-fusion(RetinaNet) | 0.416        | 0.432     | 0.357       |0.819       | 0.828    | 0.789      |
