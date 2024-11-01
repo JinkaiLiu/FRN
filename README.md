@@ -8,6 +8,17 @@
 # Abstract
 This work addresses the major challenges in object detection for autonomous driving, particularly under demanding conditions such as motion blur, adverse weather, and image noise. Recognizing the limitations of traditional camera systems in these scenarios, this work focuses on leveraging the unique attributes of event cameras, such as their low latency and high dynamic range. These attributes offer promising solutions to complement and augment the capabilities of standard RGB cameras. To leverage these benefits, this work introduces a novel RGB-Event network architecture with a unique fusion module. This module effectively utilizes information from both RGB and event modalities, integrating attention mechanisms and AdaIN (Adaptive Instance Normalization) for enhanced performance. The effectiveness of this approach is validated using two datasets: DSEC and PKU-DDD17-Car, with additional image corruption tests to assess robustness. Results demonstrate that the proposed method significantly outperforms existing state-of-the-art RGB-Event fusion alternatives in both datasets and shows remarkable stability under various image corruption scenarios.
 
+If you find it helpful for your research, please cite:
+
+```bibtex
+@InProceedings{cao2024embracing,
+  title={Embracing events and frames with hierarchical feature refinement network for object detection},
+  author={Cao, Hu and Zhang, Zehua and Xia, Yan and Li, Xinyi and Xia, Jiahao and Chen, Guang and Knoll, Alois},
+  booktitle ={ECCV},
+  year={2024}
+}
+```
+
 ## Setup
 - Setup python environment
 
