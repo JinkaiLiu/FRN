@@ -84,7 +84,7 @@ class DSECDetDataset(Dataset):
             
             # Define required file paths
             tracks_file = seq_path / 'object_detections' / 'left' / 'tracks.npy'
-            timestamps_file = seq_path / 'images' / 'left' / 'timestamps.txt'
+            timestamps_file = seq_path / 'images' / 'left' / 'exposure_timestamps.txt'
             
             # Choose event file based on parameter
             if self.use_downsampled_events:
