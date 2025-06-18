@@ -134,7 +134,7 @@ def detect_image(image_path, model_path, class_list):
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(description='Simple script for visualizing result of training.')
-    base_dir = '/media/data/hucao/zhenwu/hucao/DSEC/DSEC_ev_img'
+    base_dir = '/media/data/hucao/zhenwu/hucao/DSEC/DSEC_Det'
     parser.add_argument('--image_dir', default= f'{base_dir}/train/events/zurich_city_01_e/left',help='Path to directory containing images')
     # parser.add_argument('--image_dir', default= f'{base_dir}/train/transformed_images/zurich_city_01_e/images/left',help='Path to directory containing images')
     parser.add_argument('--class_list', default=f'{base_dir}/DSEC_detection_labels/labels_filtered_map.csv',help='Path to CSV file listing class names (see README)')

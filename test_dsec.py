@@ -59,7 +59,7 @@ def create_dataset_and_loader(dataset_name, csv_file, class_file, root_event_dir
 
 
 def setup_arg_parser():
-    base_dir = '/media/data/hucao/zhenwu/hucao/DSEC/DSEC_ev_img'
+    base_dir = '/media/data/hucao/zhenwu/hucao/DSEC/DSEC_Det'
     parser = argparse.ArgumentParser(description='Simple training script for training a RetinaNet network.')
     parser.add_argument('--dataset_name', default='dsec', help='dsec or ddd17')
     parser.add_argument('--dataset', default='csv', help='Dataset type, must be one of csv or coco.')

@@ -32,15 +32,15 @@ def time_since(since):
 
 
 def main(args=None):
-    base_dir = '/media/data/hucao/zhenwu/hucao/DSEC/DSEC_ev_img'
+    base_dir = '/media/data/hucao/zhenwu/hucao/DSEC/DSEC_Det'
     parser = argparse.ArgumentParser(description='Simple training script for training a RetinaNet network.')
     
     parser.add_argument('--dataset_name', default='dsec', help='dsec or ddd17')
     parser.add_argument('--dataset', default='csv', help='Dataset type, must be one of csv or coco.') 
     parser.add_argument('--coco_path', help='Path to COCO directory')
-    parser.add_argument('--csv_train', default=f'/media/data/hucao/zhenwu/hucao/DSEC/DSEC_ev_img/DSEC_detection_labels/labels_filtered_train.csv',
+    parser.add_argument('--csv_train', default=f'/media/data/hucao/zhenwu/hucao/DSEC/DSEC_Det/DSEC_detection_labels/labels_filtered_train.csv',
                         help='Path to file containing training annotations (see readme)') 
-    parser.add_argument('--csv_classes', default=f'/media/data/hucao/zhenwu/hucao/DSEC/DSEC_ev_img/DSEC_detection_labels/labels_filtered_map.csv', 
+    parser.add_argument('--csv_classes', default=f'/media/data/hucao/zhenwu/hucao/DSEC/DSEC_Det/DSEC_detection_labels/labels_filtered_map.csv', 
                         help='Path to file containing class list (see readme)')
     parser.add_argument('--csv_val', help='Path to file containing validation annotations (optional, see readme)') 
     parser.add_argument('--root_img',default=f'{base_dir}/train/transformed_images',help='dir to root rgb images') 
@@ -77,7 +77,7 @@ def main(args=None):
 
     # sampler = AspectRatioBasedSampler(dataset_train, batch_size=2, drop_last=False)
     dataloader_train = DataLoader(dataset_train, batch_size=1, num_workers=6, shuffle=True,collate_fn=collater) 
-    dataset_val1 = CSVDataset_event(dataset_name=parser.dataset_name, train_file='/media/data/hucao/zhenwu/hucao/DSEC/DSEC_ev_img/DSEC_detection_labels/labels_filtered_test.csv', class_list=parser.csv_classes,
+    dataset_val1 = CSVDataset_event(dataset_name=parser.dataset_name, train_file='/media/data/hucao/zhenwu/hucao/DSEC/DSEC_Det/DSEC_detection_labels/labels_filtered_test.csv', class_list=parser.csv_classes,
                                     root_event_dir=parser.root_event,root_img_dir=parser.root_img, transform=transforms.Compose([Normalizer(dataset_name=parser.dataset_name), Resizer(dataset_name=parser.dataset_name)]))
     dataloader_val1 = DataLoader(dataset_val1 , batch_size=1, num_workers=6, shuffle=True,collate_fn=collater)
 
