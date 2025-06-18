@@ -9,7 +9,7 @@ import torch.optim as optim
 import pickle
 
 from retinanet import model
-from dsec_dataloader import create_dsec_det_dataloader
+from retinanet.dataloader_dsec_det import create_dsec_det_dataloader
 from retinanet import csv_eval
 
 assert torch.__version__.split('.')[0] == '1'

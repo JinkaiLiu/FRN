@@ -375,7 +375,7 @@ class DSECDetDataset(Dataset):
         return float(self.image_width) / float(self.image_height)
 
 class Resizer(object):
-    """Resize images and annotations to target size (FRN compatible)"""
+    """Resize images and annotations to target size"""
     def __init__(self, dataset_name='dsec'):
         self.dataset_name = dataset_name
 
@@ -420,7 +420,7 @@ class Resizer(object):
         return {'img': sample['img'], 'img_rgb': torch.from_numpy(image.astype(np.float32)), 'annot': torch.from_numpy(annots), 'scale': scale}
 
 class Normalizer(object):
-    """Normalize RGB images using ImageNet statistics (FRN compatible)"""
+    """Normalize RGB images using ImageNet statistics"""
     def __init__(self, dataset_name='dsec'):
         # ImageNet normalization parameters
         if dataset_name == 'dsec':
@@ -442,7 +442,7 @@ class Normalizer(object):
         return {'img': sample['img'],'img_rgb': torch.from_numpy(((image.astype(np.float32)-self.mean)/self.std)), 'annot': annots}
 
 class Augmenter(object):
-    """Data augmentation with horizontal flipping (FRN compatible)"""
+    """Data augmentation with horizontal flipping"""
     def __call__(self, sample, flip_x=0.5):
         if np.random.rand() < flip_x:
             image_rgb = sample['img_rgb']
@@ -481,7 +481,7 @@ class Augmenter(object):
 
 def collater(data):
     """
-    Collate function for batching data (FRN compatible)
+    Collate function for batching data 
     Handles variable-sized images and annotations
     """
     # Extract data from batch
