@@ -8,7 +8,7 @@ import torch.optim as optim
 
 from retinanet import model
 from retinanet.dataloader_dsec_det import create_dsec_det_dataloader
-from retinanet import csv_eval
+from retinanet import csv_eval_dsec_det
 
 assert torch.__version__.split('.')[0] == '1' 
 
@@ -208,7 +208,7 @@ def main(args=None):
         if dataset_val is not None:
             print('Evaluating on validation dataset...')
             try:
-                mAP = csv_eval.evaluate(dataset_val, retinanet)
+                mAP = csv_eval_dsec_det.evaluate(dataset_val, retinanet)
                 print(f'Validation mAP: {mAP}')
             except Exception as e:
                 print(f"Validation evaluation failed: {e}")

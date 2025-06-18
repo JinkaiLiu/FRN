@@ -10,7 +10,7 @@ import pickle
 
 from retinanet import model
 from retinanet.dataloader_dsec_det import create_dsec_det_dataloader
-from retinanet import csv_eval
+from retinanet import csv_eval_dsec_det
 
 assert torch.__version__.split('.')[0] == '1'
 
@@ -160,7 +160,7 @@ def main(args=None):
                     test_loader, test_dataset = create_test_dataloader(args, corruption, severity)
                     
                     start = time.time()
-                    mAP = csv_eval.evaluate_coco_map(
+                    mAP = csv_eval_dsec_det.evaluate_coco_map(
                         test_dataset, retinanet, 
                         save_detection=args.save_results,
                         save_folder=save_detect_folder,
@@ -204,7 +204,7 @@ def main(args=None):
         os.makedirs(save_detect_folder, exist_ok=True)
         
         try:
-            mAP = csv_eval.evaluate_coco_map(
+            mAP = csv_eval_dsec_det.evaluate_coco_map(
                 test_dataset, retinanet,
                 save_detection=args.save_results,
                 save_folder=save_detect_folder,
