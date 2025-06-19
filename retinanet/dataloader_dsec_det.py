@@ -7,8 +7,6 @@ import random
 import h5py
 from torch.utils.data import Dataset, DataLoader
 from torch.utils.data.sampler import Sampler
-#import skimage.transform
-import cv2
 from PIL import Image
 import yaml
 from pathlib import Path
@@ -18,7 +16,8 @@ try:
     SKIMAGE_AVAILABLE = True
 except ImportError:
     SKIMAGE_AVAILABLE = False
-    import cv2  # 用cv2替代
+    import cv2
+
 
 class DSECDetDataset(Dataset):
     """
@@ -81,6 +80,7 @@ class DSECDetDataset(Dataset):
         samples = []
         
         for seq in self.sequences:
+            print(f" Processing sequence: {seq}")
             # Decide sequence path based on split type
             if self.split == 'test':
                 seq_path = self.root_dir / 'test' / seq
@@ -112,14 +112,23 @@ class DSECDetDataset(Dataset):
             try:
                 # Load image timestamps
                 with open(timestamps_file, 'r') as f:
-                    image_timestamps = [int(line.strip()) for line in f]
-                
+                    image_timestamps = []
+                    for line in f:
+                        line = line.strip()
+                        if line and not line.startswith('#'):
+                            timestamp = line.split(',')[0].strip()
+                            try:
+                                image_timestamps.append(int(timestamp))
+                            except ValueError:
+                                continue
+                print(f"📅 Loaded {len(image_timestamps)} timestamps")
                 # Load annotation data
                 tracks_data = np.load(str(tracks_file))
-                
+                print(f"📋 Loaded {len(tracks_data)} tracks")
                 # Create sample for each image timestamp
+                sample_count = 0
                 for i, img_timestamp in enumerate(image_timestamps):
-                    img_file = image_dir / f'{img_timestamp:06d}.png'
+                    img_file = image_dir / f'{i:06d}.png'
                     if img_file.exists():
                         # Find annotations for corresponding timestamp (25ms tolerance)
                         mask = np.abs(tracks_data['t'] - img_timestamp) <= 25000
@@ -133,11 +142,12 @@ class DSECDetDataset(Dataset):
                             'tracks': frame_tracks,
                             'image_index': i
                         })
-                        
+                        sample_count += 1
+                print(f"✅ Created {sample_count} samples for {seq}")        
             except Exception as e:
                 print(f"Error processing sequence {seq}: {e}")
                 continue
-        
+        print(f"🎯 Total samples loaded: {len(samples)}")
         return samples
     
     def __len__(self):
@@ -206,10 +216,10 @@ class DSECDetDataset(Dataset):
         try:
             with h5py.File(events_path, 'r') as f:
                 # Load event data arrays
-                events_t = f['events/t'][:]
-                events_x = f['events/x'][:]
-                events_y = f['events/y'][:]
-                events_p = f['events/p'][:]
+                events_t = f['events/t'][:].copy()
+                events_x = f['events/x'][:].copy()
+                events_y = f['events/y'][:].copy()
+                events_p = f['events/p'][:].copy()
                 
                 # Apply time offset if available
                 if 't_offset' in f:
@@ -268,7 +278,7 @@ class DSECDetDataset(Dataset):
         if self.normalize_events:
             time_surface = time_surface * 2.0 - 1.0
         
-        return torch.from_numpy(time_surface).float()
+        return torch.from_numpy(time_surface.copy()).float()
     
     def _create_event_count_image(self, x, y, p):
         """Create event count representation [2, H, W]"""
@@ -293,7 +303,7 @@ class DSECDetDataset(Dataset):
             if max_val > 0:
                 event_count = event_count / max_val
         
-        return torch.from_numpy(event_count).float()
+        return torch.from_numpy(event_count.copy()).float()
     
     def _create_binary_image(self, x, y, p):
         """Create binary event representation [2, H, W]"""
@@ -311,7 +321,7 @@ class DSECDetDataset(Dataset):
                 polarity_idx = 1 if p_valid[i] > 0 else 0
                 binary_image[polarity_idx, y_valid[i], x_valid[i]] = 1.0
         
-        return torch.from_numpy(binary_image).float()
+        return torch.from_numpy(binary_image.copy()).float()
     
     def _process_tracks(self, tracks):
         """Process annotation data to FRN format [N, 5]"""
