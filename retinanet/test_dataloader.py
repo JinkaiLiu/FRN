@@ -29,7 +29,7 @@ def test_dataloader():
             root_dir=dataset_root,
             split='train',
             batch_size=2,
-            num_workers=1,
+            num_workers=0,
             event_representation='time_surface',
             dt=50,
             image_height=480,
@@ -46,6 +46,7 @@ def test_dataloader():
         print(f"✅ Class names: {list(train_dataset.classes.keys())}")
         
         print("\nTesting data loading...")
+        print("Starting first batch loading (before DataLoader iteration)...")
         for i, batch in enumerate(train_loader):
             print(f"✅ Batch {i}:")
             print(f"   Event images: {batch['img'].shape}")
@@ -89,7 +90,7 @@ def test_dataloader():
                 root_dir=dataset_root,
                 split='val',
                 batch_size=2,
-                num_workers=1,
+                num_workers=0,
                 event_representation='time_surface',
                 dt=50,
                 split_config_path=split_config_path,
