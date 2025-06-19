@@ -7,12 +7,18 @@ import random
 import h5py
 from torch.utils.data import Dataset, DataLoader
 from torch.utils.data.sampler import Sampler
-import skimage.transform
+#import skimage.transform
 import cv2
 from PIL import Image
 import yaml
 from pathlib import Path
 from torchvision import transforms
+try:
+    import skimage.transform
+    SKIMAGE_AVAILABLE = True
+except ImportError:
+    SKIMAGE_AVAILABLE = False
+    import cv2  # 用cv2替代
 
 class DSECDetDataset(Dataset):
     """
@@ -409,9 +415,15 @@ class Resizer(object):
 
         # Resize image
         if len(image.shape) == 3:
-            image = skimage.transform.resize(image, (int(round(rows*scale)), int(round((cols*scale)))))
+            if SKIMAGE_AVAILABLE:
+                image = skimage.transform.resize(image, (int(round(rows*scale)), int(round((cols*scale)))))
+            else:
+                image = cv2.resize(image, (int(round(cols*scale)), int(round(rows*scale))))
         else:
-            image = skimage.transform.resize(image, (int(round(rows*scale)), int(round((cols*scale)))))
+            if SKIMAGE_AVAILABLE:
+                image = skimage.transform.resize(image, (int(round(rows*scale)), int(round((cols*scale)))))
+            else:
+                image = cv2.resize(image, (int(round(cols*scale)), int(round(rows*scale))))
 
         # Scale annotations accordingly
         if len(annots) > 0:
