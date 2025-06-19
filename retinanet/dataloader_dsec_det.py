@@ -35,7 +35,7 @@ class DSECDetDataset(Dataset):
                  dt=50, debug=False, split_config=None, 
                  image_height=480, image_width=640,
                  normalize_events=True, normalize_images=False, 
-                 use_downsampled_events=False):
+                 use_downsampled_events=True):
         
         self.root_dir = Path(root_dir)
         self.split = split
@@ -571,7 +571,7 @@ def create_dsec_det_dataloader(root_dir, split='train', batch_size=8, num_worker
                               shuffle=None, event_representation='time_surface', dt=50,
                               image_height=480, image_width=640, augment=True, debug=False,
                               split_config_path=None, normalize_events=True, normalize_images=True,
-                              use_downsampled_events=False, use_aspect_ratio_sampler=False):
+                              use_downsampled_events=True, use_aspect_ratio_sampler=False):
     
     if shuffle is None:
         shuffle = (split == 'train')
