@@ -4,7 +4,7 @@ import os
 import torch
 import numpy as np
 import random
-import h5py
+# import h5py
 from torch.utils.data import Dataset, DataLoader
 from torch.utils.data.sampler import Sampler
 from PIL import Image
@@ -19,6 +19,8 @@ try:
 except ImportError:
     HDF5_PLUGINS_AVAILABLE = False
     print("Warning: hdf5plugin or blosc not available. Some HDF5 files may not load correctly.")
+
+import h5py
 
 try:
     import skimage.transform
