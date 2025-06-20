@@ -40,84 +40,97 @@ def _get_detections(dataset, retinanet, score_threshold=0.05, max_detections=100
     
     with torch.no_grad():
         for index in range(len(dataset)):
-            data = dataset[index]
             try:
+                data = dataset[index]
                 scale = data.get('scale', 1.0)
-            except:
-                scale = 1.0
 
-            if torch.cuda.is_available():
+                # Get data from sample
                 img_rgb = data['img_rgb']
                 img_event = data['img']
                 
-                if len(img_rgb.shape) == 3:
-                    img_rgb = img_rgb.permute(2, 0, 1).cuda().float().unsqueeze(dim=0)
-                elif len(img_rgb.shape) == 4:
-                    img_rgb = img_rgb.cuda().float()
+                # Process RGB image format
+                if isinstance(img_rgb, torch.Tensor):
+                    if len(img_rgb.shape) == 3:  # HWC format
+                        if img_rgb.shape[-1] == 3:  # Confirm HWC format
+                            img_rgb = img_rgb.permute(2, 0, 1)  # HWC -> CHW
+                        img_rgb = img_rgb.unsqueeze(0)  # CHW -> BCHW
+                    elif len(img_rgb.shape) == 4:  # BHWC format
+                        if img_rgb.shape[-1] == 3:
+                            img_rgb = img_rgb.permute(0, 3, 1, 2)  # BHWC -> BCHW
                 else:
-                    print(f"Unexpected img_rgb shape: {img_rgb.shape}")
-                    continue
-                
-                if len(img_event.shape) == 3:
-                    if img_event.shape[0] <= 3:
-                        img_event = img_event.cuda().float().unsqueeze(dim=0)
+                    # Convert numpy array to tensor
+                    if len(img_rgb.shape) == 3 and img_rgb.shape[-1] == 3:
+                        img_rgb = torch.from_numpy(img_rgb).permute(2, 0, 1).unsqueeze(0)
                     else:
-                        img_event = img_event.permute(2, 0, 1).cuda().float().unsqueeze(dim=0)
-                elif len(img_event.shape) == 4:
+                        img_rgb = torch.from_numpy(img_rgb).unsqueeze(0)
+                
+                # Process event image format
+                if isinstance(img_event, torch.Tensor):
+                    if len(img_event.shape) == 3:  # CHW format
+                        img_event = img_event.unsqueeze(0)  # CHW -> BCHW
+                    elif len(img_event.shape) == 4:  # BCHW format - already correct
+                        pass
+                else:
+                    # Convert numpy array to tensor
+                    img_event = torch.from_numpy(img_event)
+                    if len(img_event.shape) == 3:
+                        img_event = img_event.unsqueeze(0)
+                
+                # Move to correct device
+                if torch.cuda.is_available():
+                    img_rgb = img_rgb.cuda().float()
                     img_event = img_event.cuda().float()
                 else:
-                    print(f"Unexpected img_event shape: {img_event.shape}")
-                    continue
-                
-                scores, labels, boxes = retinanet([img_rgb, img_event])
-            else:
-                img_rgb = data['img_rgb']
-                img_event = data['img']
-                
-                if len(img_rgb.shape) == 3:
-                    img_rgb = img_rgb.permute(2, 0, 1).float().unsqueeze(dim=0)
-                elif len(img_rgb.shape) == 4:
                     img_rgb = img_rgb.float()
-                else:
-                    print(f"Unexpected img_rgb shape: {img_rgb.shape}")
-                    continue
-                
-                if len(img_event.shape) == 3:
-                    if img_event.shape[0] <= 3:
-                        img_event = img_event.float().unsqueeze(dim=0)
-                    else:
-                        img_event = img_event.permute(2, 0, 1).float().unsqueeze(dim=0)
-                elif len(img_event.shape) == 4:
                     img_event = img_event.float()
-                else:
-                    print(f"Unexpected img_event shape: {img_event.shape}")
-                    continue
                 
+                # Model inference
                 scores, labels, boxes = retinanet([img_rgb, img_event])
                 
-            scores = scores.cpu().numpy()
-            labels = labels.cpu().numpy()
-            boxes = boxes.cpu().numpy()
+                # Convert back to CPU
+                scores = scores.cpu().numpy()
+                labels = labels.cpu().numpy()
+                boxes = boxes.cpu().numpy()
 
-            boxes /= scale
-            
-            indices = np.where(scores > score_threshold)[0]
-            if indices.shape[0] > 0:
-                scores = scores[indices]
-                scores_sort = np.argsort(-scores)[:max_detections]
+                # Scale adjustment
+                if isinstance(scale, (list, tuple)):
+                    boxes[:, [0, 2]] /= scale[0]  # x coordinates
+                    boxes[:, [1, 3]] /= scale[1]  # y coordinates
+                else:
+                    boxes /= scale
+                
+                # Filter detection results
+                indices = np.where(scores > score_threshold)[0]
+                if indices.shape[0] > 0:
+                    scores = scores[indices]
+                    scores_sort = np.argsort(-scores)[:max_detections]
 
-                image_boxes = boxes[indices[scores_sort], :]
-                image_scores = scores[scores_sort]
-                image_labels = labels[indices[scores_sort]]
-                image_detections = np.concatenate([image_boxes, np.expand_dims(image_scores, axis=1), np.expand_dims(image_labels, axis=1)], axis=1)
+                    image_boxes = boxes[indices[scores_sort], :]
+                    image_scores = scores[scores_sort]
+                    image_labels = labels[indices[scores_sort]]
+                    image_detections = np.concatenate([
+                        image_boxes, 
+                        np.expand_dims(image_scores, axis=1), 
+                        np.expand_dims(image_labels, axis=1)
+                    ], axis=1)
 
-                for label in range(dataset.num_classes()):
-                    all_detections[index][label] = image_detections[image_detections[:, -1] == label, :-1]
-            else:
+                    # Group by class
+                    for label in range(dataset.num_classes()):
+                        all_detections[index][label] = image_detections[image_detections[:, -1] == label, :-1]
+                else:
+                    # No detections found
+                    for label in range(dataset.num_classes()):
+                        all_detections[index][label] = np.zeros((0, 5))
+
+                if (index + 1) % 100 == 0:
+                    print(f'Processing: {index + 1}/{len(dataset)}')
+                    
+            except Exception as e:
+                print(f"Error processing sample {index}: {e}")
+                # Create empty detection results
                 for label in range(dataset.num_classes()):
                     all_detections[index][label] = np.zeros((0, 5))
-
-            print('{}/{}'.format(index + 1, len(dataset)), end='\r')
+                continue
 
     return all_detections
 
@@ -129,19 +142,33 @@ def _get_annotations(generator):
             sample = generator[i]
             annotations = sample['annot']
             
+            # Ensure annotations is numpy array
             if isinstance(annotations, torch.Tensor):
                 annotations = annotations.numpy()
             
-            valid_annotations = annotations[annotations[:, 4] >= 0]
+            # Filter valid annotations (exclude padded -1 values)
+            if len(annotations) > 0:
+                valid_mask = annotations[:, 4] >= 0
+                valid_annotations = annotations[valid_mask]
+            else:
+                valid_annotations = np.zeros((0, 5))
             
+            # Group annotations by class
             for label in range(generator.num_classes()):
-                all_annotations[i][label] = valid_annotations[valid_annotations[:, 4] == label, :4].copy()
+                if len(valid_annotations) > 0:
+                    class_annotations = valid_annotations[valid_annotations[:, 4] == label, :4].copy()
+                    all_annotations[i][label] = class_annotations
+                else:
+                    all_annotations[i][label] = np.zeros((0, 4))
+                    
         except Exception as e:
             print(f"Error loading annotations for sample {i}: {e}")
+            # Create empty annotations
             for label in range(generator.num_classes()):
                 all_annotations[i][label] = np.zeros((0, 4))
 
-        print('{}/{}'.format(i + 1, len(generator)), end='\r')
+        if (i + 1) % 100 == 0:
+            print(f'Loading annotations: {i + 1}/{len(generator)}')
 
     return all_annotations
 
@@ -157,25 +184,27 @@ def evaluate_coco_map(
     save_path=None
 ):
     os.makedirs(save_folder, exist_ok=True)
-    detections_file = os.path.join(save_folder, 'detections.txt')
-    annotations_file = os.path.join(save_folder, 'annotations.txt')
+    detections_file = os.path.join(save_folder, 'detections.pkl')
+    annotations_file = os.path.join(save_folder, 'annotations.pkl')
 
-    if load_detection == True:
+    if load_detection and os.path.exists(detections_file) and os.path.exists(annotations_file):
+        print("Loading cached detections and annotations...")
         with open(detections_file, "rb") as fp:  
             all_detections = pickle.load(fp)
-
         with open(annotations_file, "rb") as fp: 
             all_annotations = pickle.load(fp)
     else:
+        print("Computing detections and annotations...")
         all_detections = _get_detections(generator, retinanet, score_threshold=score_threshold, max_detections=max_detections, save_path=save_path)
         all_annotations = _get_annotations(generator)
-        if save_detection == True:
+        
+        if save_detection:
             with open(detections_file, "wb") as fp:
                 pickle.dump(all_detections, fp)
-
             with open(annotations_file, "wb") as fp:
                 pickle.dump(all_annotations, fp)
 
+    # Compute AP at different IoU thresholds
     average_precisions = {}
     average_precisions_coco = {}
     for label in range(generator.num_classes()):
@@ -246,7 +275,8 @@ def evaluate_coco_map(
 
         label_name = generator.label_to_name(label)
         
-        if save_path != None:
+        if save_path is not None:
+            os.makedirs(save_path, exist_ok=True)
             plt.figure()
             plt.plot(recall, precision)
             plt.xlabel('Recall') 
@@ -269,22 +299,23 @@ def evaluate(
     save_path=None
 ):
     os.makedirs(save_folder, exist_ok=True)
-    detections_file = os.path.join(save_folder, 'detections.txt')
-    annotations_file = os.path.join(save_folder, 'annotations.txt')
+    detections_file = os.path.join(save_folder, 'detections.pkl')
+    annotations_file = os.path.join(save_folder, 'annotations.pkl')
 
-    if load_detection == True:
+    if load_detection and os.path.exists(detections_file) and os.path.exists(annotations_file):
+        print("Loading cached detections and annotations...")
         with open(detections_file, "rb") as fp:  
             all_detections = pickle.load(fp)
-
         with open(annotations_file, "rb") as fp: 
             all_annotations = pickle.load(fp)
     else:
+        print("Computing detections and annotations...")
         all_detections = _get_detections(generator, retinanet, score_threshold=score_threshold, max_detections=max_detections, save_path=save_path)
         all_annotations = _get_annotations(generator)
-        if save_detection == True:
+        
+        if save_detection:
             with open(detections_file, "wb") as fp:
                 pickle.dump(all_detections, fp)
-
             with open(annotations_file, "wb") as fp:
                 pickle.dump(all_annotations, fp)
 
@@ -340,9 +371,10 @@ def evaluate(
         average_precisions[label] = average_precision, num_annotations
 
         label_name = generator.label_to_name(label)
-        print(f'{label_name}: mAP = {average_precision:.4f}, num_annotations = {num_annotations}')
+        print(f'{label_name}: mAP = {average_precision:.4f}, num_annotations = {int(num_annotations)}')
         
-        if save_path != None:
+        if save_path is not None:
+            os.makedirs(save_path, exist_ok=True)
             plt.figure()
             plt.plot(recall, precision)
             plt.xlabel('Recall') 
@@ -352,7 +384,18 @@ def evaluate(
             plt.close()
 
     print('\nOverall mAP:')
-    total_map = np.mean([ap[0] for ap in average_precisions.values()])
+    mAP_values = [ap[0] for ap in average_precisions.values()]
+    total_map = np.mean(mAP_values) if mAP_values else 0.0
     print(f'mAP@0.5: {total_map:.4f}')
 
-    return average_precisions
+    return total_map
+            plt.title(f'Precision Recall curve - {label_name}') 
+            plt.savefig(os.path.join(save_path, f'{label_name}_precision_recall.jpg'))
+            plt.close()
+
+    print('\nOverall mAP:')
+    mAP_values = [ap[0] for ap in average_precisions.values()]
+    total_map = np.mean(mAP_values) if mAP_values else 0.0
+    print(f'mAP@0.5: {total_map:.4f}')
+
+    return total_map
