@@ -2,9 +2,10 @@ nohup: ignoring input
 Collecting package metadata (current_repodata.json): ...working... WARNING conda.models.version:get_matcher(556): Using .* with relational operator is superfluous and deprecated and will be removed in a future version of conda. Your spec was 1.7.1.*, but conda is ignoring the .* and treating it as 1.7.1
 done
 Solving environment: ...working... unsuccessful initial attempt using frozen solve. Retrying with flexible solve.
+Solving environment: ...working... unsuccessful attempt using repodata from current_repodata.json, retrying with next repodata source.
 Collecting package metadata (repodata.json): ...working... WARNING conda.models.version:get_matcher(556): Using .* with relational operator is superfluous and deprecated and will be removed in a future version of conda. Your spec was 1.6.0.*, but conda is ignoring the .* and treating it as 1.6.0
-WARNING conda.models.version:get_matcher(556): Using .* with relational operator is superfluous and deprecated and will be removed in a future version of conda. Your spec was 1.8.0.*, but conda is ignoring the .* and treating it as 1.8.0
 WARNING conda.models.version:get_matcher(556): Using .* with relational operator is superfluous and deprecated and will be removed in a future version of conda. Your spec was 1.9.0.*, but conda is ignoring the .* and treating it as 1.9.0
+WARNING conda.models.version:get_matcher(556): Using .* with relational operator is superfluous and deprecated and will be removed in a future version of conda. Your spec was 1.8.0.*, but conda is ignoring the .* and treating it as 1.8.0
 done
 Solving environment: ...working... done
 
@@ -28,1300 +29,17 @@ Or to minimize the number of packages updated during conda update use
   environment location: /home/test7/miniconda3/envs/FRN
 
   added / updated specs:
-    - scikit-image=0.19.3
-    - scipy=1.8.1
+    - hdf5plugin
 
-
-The following packages will be downloaded:
-
-    package                    |            build
-    ---------------------------|-----------------
-    ca-certificates-2025.6.15  |       hbd8a1cb_0         148 KB  conda-forge
-    click-8.1.7                |unix_pyh707e725_0          82 KB  conda-forge
-    cloudpickle-3.1.0          |     pyhd8ed1ab_1          25 KB  conda-forge
-    cytoolz-0.11.2             |   py38h0a891b7_2         398 KB  conda-forge
-    dask-core-2023.3.1         |     pyhd8ed1ab_0         820 KB  conda-forge
-    fsspec-2024.10.0           |     pyhff2d567_0         132 KB  conda-forge
-    imagecodecs-lite-2019.12.3 |   py38h71d37f0_5         180 KB  conda-forge
-    imageio-2.36.0             |     pyh12aca89_1         285 KB  conda-forge
-    libblas-3.9.0              |   26_linux64_mkl          16 KB  conda-forge
-    libcblas-3.9.0             |   26_linux64_mkl          16 KB  conda-forge
-    liblapack-3.9.0            |   26_linux64_mkl          16 KB  conda-forge
-    locket-1.0.0               |     pyhd8ed1ab_0           8 KB  conda-forge
-    packaging-25.0             |     pyh29332c3_1          61 KB  conda-forge
-    partd-1.4.1                |     pyhd8ed1ab_0          20 KB  conda-forge
-    python_abi-3.8             |           2_cp38           4 KB  conda-forge
-    pywavelets-1.3.0           |   py38h71d37f0_1         4.4 MB  conda-forge
-    scikit-image-0.19.3        |   py38h6a678d5_1        10.5 MB  https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main
-    scipy-1.8.1                |   py38h1ee437e_0        25.0 MB  conda-forge
-    tifffile-2020.6.3          |             py_0         109 KB  conda-forge
-    toolz-1.0.0                |     pyhd8ed1ab_0          51 KB  conda-forge
-    ------------------------------------------------------------
-                                           Total:        42.3 MB
 
 The following NEW packages will be INSTALLED:
 
-  click              conda-forge/noarch::click-8.1.7-unix_pyh707e725_0 
-  cloudpickle        conda-forge/noarch::cloudpickle-3.1.0-pyhd8ed1ab_1 
-  cytoolz            conda-forge/linux-64::cytoolz-0.11.2-py38h0a891b7_2 
-  dask-core          conda-forge/noarch::dask-core-2023.3.1-pyhd8ed1ab_0 
-  fsspec             conda-forge/noarch::fsspec-2024.10.0-pyhff2d567_0 
-  imagecodecs-lite   conda-forge/linux-64::imagecodecs-lite-2019.12.3-py38h71d37f0_5 
-  imageio            conda-forge/noarch::imageio-2.36.0-pyh12aca89_1 
-  libblas            conda-forge/linux-64::libblas-3.9.0-26_linux64_mkl 
-  libcblas           conda-forge/linux-64::libcblas-3.9.0-26_linux64_mkl 
-  liblapack          conda-forge/linux-64::liblapack-3.9.0-26_linux64_mkl 
-  locket             conda-forge/noarch::locket-1.0.0-pyhd8ed1ab_0 
-  packaging          conda-forge/noarch::packaging-25.0-pyh29332c3_1 
-  partd              conda-forge/noarch::partd-1.4.1-pyhd8ed1ab_0 
-  python_abi         conda-forge/linux-64::python_abi-3.8-2_cp38 
-  pywavelets         conda-forge/linux-64::pywavelets-1.3.0-py38h71d37f0_1 
-  scikit-image       anaconda/pkgs/main/linux-64::scikit-image-0.19.3-py38h6a678d5_1 
-  scipy              conda-forge/linux-64::scipy-1.8.1-py38h1ee437e_0 
-  tifffile           conda-forge/noarch::tifffile-2020.6.3-py_0 
-  toolz              conda-forge/noarch::toolz-1.0.0-pyhd8ed1ab_0 
-
-The following packages will be UPDATED:
-
-  ca-certificates    anaconda/pkgs/main/linux-64::ca-certi~ --> conda-forge/noarch::ca-certificates-2025.6.15-hbd8a1cb_0 
-
-The following packages will be SUPERSEDED by a higher-priority channel:
-
-  certifi            anaconda/pkgs/main/linux-64::certifi-~ --> conda-forge/noarch::certifi-2024.8.30-pyhd8ed1ab_0 
+  hdf5plugin         conda-forge/linux-64::hdf5plugin-3.2.0-py38hb764eaf_2 
 
 
 
 Downloading and Extracting Packages
-libblas-3.9.0        | 16 KB     |            |   0% 
-scipy-1.8.1          | 25.0 MB   |            |   0% [A
 
-partd-1.4.1          | 20 KB     |            |   0% [A[A
-
-
-cloudpickle-3.1.0    | 25 KB     |            |   0% [A[A[A
-
-
-
-toolz-1.0.0          | 51 KB     |            |   0% [A[A[A[A
-
-
-
-
-locket-1.0.0         | 8 KB      |            |   0% [A[A[A[A[A
-
-
-
-
-
-imageio-2.36.0       | 285 KB    |            |   0% [A[A[A[A[A[A
-
-
-
-
-
-
-liblapack-3.9.0      | 16 KB     |            |   0% [A[A[A[A[A[A[A
-
-
-
-
-
-
-
-pywavelets-1.3.0     | 4.4 MB    |            |   0% [A[A[A[A[A[A[A[A
-
-
-
-
-
-
-
-
-libcblas-3.9.0       | 16 KB     |            |   0% [A[A[A[A[A[A[A[A[A
-
-
-
-
-
-
-
-
-
-packaging-25.0       | 61 KB     |            |   0% [A[A[A[A[A[A[A[A[A[A
-
-
-
-
-
-
-
-
-
-
-tifffile-2020.6.3    | 109 KB    |            |   0% [A[A[A[A[A[A[A[A[A[A[A
-
-
-
-
-
-
-
-
-
-
-
-cytoolz-0.11.2       | 398 KB    |            |   0% [A[A[A[A[A[A[A[A[A[A[A[A
-
-
-
-
-
-
-
-
-
-
-
-
-click-8.1.7          | 82 KB     |            |   0% [A[A[A[A[A[A[A[A[A[A[A[A[A
-
-
-
-
-
-
-
-
-
-
-
-
-
-python_abi-3.8       | 4 KB      |            |   0% [A[A[A[A[A[A[A[A[A[A[A[A[A[A
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-dask-core-2023.3.1   | 820 KB    |            |   0% [A[A[A[A[A[A[A[A[A[A[A[A[A[A[A
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-fsspec-2024.10.0     | 132 KB    |            |   0% [A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-scikit-image-0.19.3  | 10.5 MB   |            |   0% [A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-imagecodecs-lite-201 | 180 KB    |            |   0% [A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
- ... (more hidden) ...[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A
-scipy-1.8.1          | 25.0 MB   |            |   0% [A
-scipy-1.8.1          | 25.0 MB   |            |   0% [A
-
-partd-1.4.1          | 20 KB     | #######8   |  79% [A[A
-
-
-
-
-locket-1.0.0         | 8 KB      | ########## | 100% [A[A[A[A[Alibblas-3.9.0        | 16 KB     | #########7 |  98% 
-scipy-1.8.1          | 25.0 MB   |            |   0% [A
-scipy-1.8.1          | 25.0 MB   |            |   1% [A
-
-
-
-
-
-
-liblapack-3.9.0      | 16 KB     | ########## | 100% [A[A[A[A[A[A[A
-
-
-
-
-
-imageio-2.36.0       | 285 KB    | 5          |   6% [A[A[A[A[A[A
-
-
-
-toolz-1.0.0          | 51 KB     | ###1       |  31% [A[A[A[A
-scipy-1.8.1          | 25.0 MB   | 1          |   1% [A
-
-
-
-
-
-imageio-2.36.0       | 285 KB    | ##2        |  22% [A[A[A[A[A[A
-scipy-1.8.1          | 25.0 MB   | 2          |   2% [A
-scipy-1.8.1          | 25.0 MB   | 3          |   4% [A
-
-
-
-
-
-
-
-pywavelets-1.3.0     | 4.4 MB    |            |   0% [A[A[A[A[A[A[A[A
-
-
-
-
-
-imageio-2.36.0       | 285 KB    | #######2   |  73% [A[A[A[A[A[A
-scipy-1.8.1          | 25.0 MB   | 4          |   5% [A
-
-
-
-
-
-
-
-pywavelets-1.3.0     | 4.4 MB    | 3          |   4% [A[A[A[A[A[A[A[A
-
-
-cloudpickle-3.1.0    | 25 KB     | ######3    |  63% [A[A[A
-
-
-
-
-
-
-
-pywavelets-1.3.0     | 4.4 MB    | 6          |   6% [A[A[A[A[A[A[A[A
-scipy-1.8.1          | 25.0 MB   | 7          |   7% [A
-scipy-1.8.1          | 25.0 MB   | 9          |  10% [A
-
-
-
-
-
-
-
-pywavelets-1.3.0     | 4.4 MB    | 7          |   7% [A[A[A[A[A[A[A[A
-
-
-cloudpickle-3.1.0    | 25 KB     | ########## | 100% [A[A[A
-
-
-
-
-
-
-
-pywavelets-1.3.0     | 4.4 MB    | #2         |  12% [A[A[A[A[A[A[A[A
-
-
-
-
-
-
-
-
-
-packaging-25.0       | 61 KB     | ##6        |  26% [A[A[A[A[A[A[A[A[A[A
-scipy-1.8.1          | 25.0 MB   | #          |  11% [A
-
-
-
-
-
-
-
-pywavelets-1.3.0     | 4.4 MB    | #8         |  18% [A[A[A[A[A[A[A[A
-scipy-1.8.1          | 25.0 MB   | #6         |  16% [A
-
-partd-1.4.1          | 20 KB     | ########## | 100% [A[A
-
-
-
-
-
-
-
-
-
-packaging-25.0       | 61 KB     | #####2     |  52% [A[A[A[A[A[A[A[A[A[A
-
-partd-1.4.1          | 20 KB     | ########## | 100% [A[A
-
-
-
-
-locket-1.0.0         | 8 KB      | ########## | 100% [A[A[A[A[A
-
-
-
-
-
-
-
-
-libcblas-3.9.0       | 16 KB     | ########## | 100% [A[A[A[A[A[A[A[A[A
-
-
-
-
-
-
-
-pywavelets-1.3.0     | 4.4 MB    | ###        |  31% [A[A[A[A[A[A[A[A
-
-
-
-
-
-
-
-
-
-
-tifffile-2020.6.3    | 109 KB    | #4         |  15% [A[A[A[A[A[A[A[A[A[A[A
-scipy-1.8.1          | 25.0 MB   | #7         |  18% [A
-
-
-
-
-
-
-
-pywavelets-1.3.0     | 4.4 MB    | #####9     |  60% [A[A[A[A[A[A[A[A
-scipy-1.8.1          | 25.0 MB   | ##2        |  22% [A
-
-
-
-
-
-
-
-
-
-
-tifffile-2020.6.3    | 109 KB    | #####8     |  59% [A[A[A[A[A[A[A[A[A[A[A
-
-
-
-
-
-
-
-
-
-
-
-
-click-8.1.7          | 82 KB     | #9         |  19% [A[A[A[A[A[A[A[A[A[A[A[A[A
-
-
-
-
-
-
-
-
-
-
-
-cytoolz-0.11.2       | 398 KB    | 4          |   4% [A[A[A[A[A[A[A[A[A[A[A[A
-
-
-
-
-
-
-
-
-
-
-
-
-click-8.1.7          | 82 KB     | ###8       |  39% [A[A[A[A[A[A[A[A[A[A[A[A[A
-
-
-
-
-
-
-
-
-
-
-
-cytoolz-0.11.2       | 398 KB    | 8          |   8% [A[A[A[A[A[A[A[A[A[A[A[A
-
-
-
-
-
-
-
-pywavelets-1.3.0     | 4.4 MB    | ######4    |  64% [A[A[A[A[A[A[A[A
-scipy-1.8.1          | 25.0 MB   | ##3        |  23% [A
-
-
-
-
-
-
-
-
-
-
-tifffile-2020.6.3    | 109 KB    | #######3   |  74% [A[A[A[A[A[A[A[A[A[A[A
-
-
-
-
-
-
-
-
-
-
-
-
-
-python_abi-3.8       | 4 KB      | ########## | 100% [A[A[A[A[A[A[A[A[A[A[A[A[A[A
-scipy-1.8.1          | 25.0 MB   | ###1       |  31% [A
-scipy-1.8.1          | 25.0 MB   | ###3       |  34% [A
-
-
-
-
-
-
-
-
-
-
-
-cytoolz-0.11.2       | 398 KB    | ########   |  80% [A[A[A[A[A[A[A[A[A[A[A[A
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-scikit-image-0.19.3  | 10.5 MB   |            |   0% [A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-dask-core-2023.3.1   | 820 KB    | 1          |   2% [A[A[A[A[A[A[A[A[A[A[A[A[A[A[A
-scipy-1.8.1          | 25.0 MB   | ###5       |  35% [A
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-imagecodecs-lite-201 | 180 KB    | 8          |   9% [A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-scikit-image-0.19.3  | 10.5 MB   | 1          |   1% [A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-fsspec-2024.10.0     | 132 KB    | #2         |  12% [A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A
-scipy-1.8.1          | 25.0 MB   | ###7       |  37% [A
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-scikit-image-0.19.3  | 10.5 MB   | ##9        |  30% [A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-scikit-image-0.19.3  | 10.5 MB   | ########5  |  85% [A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-dask-core-2023.3.1   | 820 KB    | ####6      |  47% [A[A[A[A[A[A[A[A[A[A[A[A[A[A[A
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-imagecodecs-lite-201 | 180 KB    | #7         |  18% [A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A
-scipy-1.8.1          | 25.0 MB   | ####       |  40% [A
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-imagecodecs-lite-201 | 180 KB    | ######2    |  62% [A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A
-scipy-1.8.1          | 25.0 MB   | ####4      |  44% [A
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-fsspec-2024.10.0     | 132 KB    | ##4        |  24% [A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-imagecodecs-lite-201 | 180 KB    | ########   |  80% [A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
- ... (more hidden) ...[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A
-scipy-1.8.1          | 25.0 MB   | ####6      |  46% [A
-scipy-1.8.1          | 25.0 MB   | ####9      |  49% [A
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-fsspec-2024.10.0     | 132 KB    | ######     |  61% [A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[Alibblas-3.9.0        | 16 KB     | ########## | 100% 
-scipy-1.8.1          | 25.0 MB   | #####2     |  53% [A
-scipy-1.8.1          | 25.0 MB   | #####7     |  57% [A
-scipy-1.8.1          | 25.0 MB   | ######1    |  61% [A
-scipy-1.8.1          | 25.0 MB   | ######6    |  67% [A
-scipy-1.8.1          | 25.0 MB   | ######9    |  69% [A
-scipy-1.8.1          | 25.0 MB   | #######1   |  71% [A
-scipy-1.8.1          | 25.0 MB   | #######9   |  79% [A
-scipy-1.8.1          | 25.0 MB   | ########2  |  82% [A
-scipy-1.8.1          | 25.0 MB   | ########6  |  86% [A
-scipy-1.8.1          | 25.0 MB   | #########1 |  91% [A
-scipy-1.8.1          | 25.0 MB   | #########3 |  94% [A
-
-
-
-
-
-
-liblapack-3.9.0      | 16 KB     | ########## | 100% [A[A[A[A[A[A[A
-scipy-1.8.1          | 25.0 MB   | #########5 |  95% [A
-
-
-
-toolz-1.0.0          | 51 KB     | ########## | 100% [A[A[A[A
-
-
-
-toolz-1.0.0          | 51 KB     | ########## | 100% [A[A[A[A
-
-
-
-
-
-imageio-2.36.0       | 285 KB    | ########## | 100% [A[A[A[A[A[A
-
-
-
-
-
-imageio-2.36.0       | 285 KB    | ########## | 100% [A[A[A[A[A[A
-
-
-cloudpickle-3.1.0    | 25 KB     | ########## | 100% [A[A[A
-
-
-
-
-
-
-
-
-
-packaging-25.0       | 61 KB     | ########## | 100% [A[A[A[A[A[A[A[A[A[A
-
-
-
-
-
-
-
-
-
-packaging-25.0       | 61 KB     | ########## | 100% [A[A[A[A[A[A[A[A[A[A
-
-
-
-
-
-
-
-
-libcblas-3.9.0       | 16 KB     | ########## | 100% [A[A[A[A[A[A[A[A[A
-
-
-
-
-
-
-
-
-
-
-
-
-click-8.1.7          | 82 KB     | ########## | 100% [A[A[A[A[A[A[A[A[A[A[A[A[A
-
-
-
-
-
-
-
-
-
-
-
-
-click-8.1.7          | 82 KB     | ########## | 100% [A[A[A[A[A[A[A[A[A[A[A[A[A
-
-
-
-
-
-
-
-pywavelets-1.3.0     | 4.4 MB    | ########## | 100% [A[A[A[A[A[A[A[A
-
-
-
-
-
-
-
-pywavelets-1.3.0     | 4.4 MB    | ########## | 100% [A[A[A[A[A[A[A[A
-
-
-
-
-
-
-
-
-
-
-tifffile-2020.6.3    | 109 KB    | ########## | 100% [A[A[A[A[A[A[A[A[A[A[A
-
-
-
-
-
-
-
-
-
-
-tifffile-2020.6.3    | 109 KB    | ########## | 100% [A[A[A[A[A[A[A[A[A[A[A
-
-
-
-
-
-
-
-
-
-
-
-
-
-python_abi-3.8       | 4 KB      | ########## | 100% [A[A[A[A[A[A[A[A[A[A[A[A[A[A
-
-
-
-
-
-
-
-
-
-
-
-cytoolz-0.11.2       | 398 KB    | ########## | 100% [A[A[A[A[A[A[A[A[A[A[A[A
-
-
-
-
-
-
-
-
-
-
-
-cytoolz-0.11.2       | 398 KB    | ########## | 100% [A[A[A[A[A[A[A[A[A[A[A[A
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-dask-core-2023.3.1   | 820 KB    | ########## | 100% [A[A[A[A[A[A[A[A[A[A[A[A[A[A[A
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-dask-core-2023.3.1   | 820 KB    | ########## | 100% [A[A[A[A[A[A[A[A[A[A[A[A[A[A[A
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-scikit-image-0.19.3  | 10.5 MB   | ########## | 100% [A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-imagecodecs-lite-201 | 180 KB    | ########## | 100% [A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-imagecodecs-lite-201 | 180 KB    | ########## | 100% [A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
- ... (more hidden) ...[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
- ... (more hidden) ...[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-fsspec-2024.10.0     | 132 KB    | ########## | 100% [A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-fsspec-2024.10.0     | 132 KB    | ########## | 100% [A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A
-scipy-1.8.1          | 25.0 MB   | ########## | 100% [A
-scipy-1.8.1          | 25.0 MB   | ########## | 100% [A
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-                      [A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A                                                     
-                                                     [A
-
-                                                     [A[A
-
-
-                                                     [A[A[A
-
-
-
-                                                     [A[A[A[A
-
-
-
-
-                                                     [A[A[A[A[A
-
-
-
-
-
-                                                     [A[A[A[A[A[A
-
-
-
-
-
-
-                                                     [A[A[A[A[A[A[A
-
-
-
-
-
-
-
-                                                     [A[A[A[A[A[A[A[A
-
-
-
-
-
-
-
-
-                                                     [A[A[A[A[A[A[A[A[A
-
-
-
-
-
-
-
-
-
-                                                     [A[A[A[A[A[A[A[A[A[A
-
-
-
-
-
-
-
-
-
-
-                                                     [A[A[A[A[A[A[A[A[A[A[A
-
-
-
-
-
-
-
-
-
-
-
-                                                     [A[A[A[A[A[A[A[A[A[A[A[A
-
-
-
-
-
-
-
-
-
-
-
-
-                                                     [A[A[A[A[A[A[A[A[A[A[A[A[A
-
-
-
-
-
-
-
-
-
-
-
-
-
-                                                     [A[A[A[A[A[A[A[A[A[A[A[A[A[A
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-                                                     [A[A[A[A[A[A[A[A[A[A[A[A[A[A[A
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-                                                     [A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-                                                     [A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-                                                     [A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A
 Preparing transaction: ...working... done
 Verifying transaction: ...working... done
 Executing transaction: ...working... done
