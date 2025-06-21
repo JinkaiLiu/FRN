@@ -176,10 +176,10 @@ class DSECDetDataset(Dataset):
         if img is None:
             raise ValueError(f"Could not load image: {image_path}")
         
-        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+        img = np.ascontiguousarray(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
         
         if img.shape[:2] != (self.image_height, self.image_width):
-            img = cv2.resize(img, (self.image_width, self.image_height))
+            img = np.ascontiguousarray(cv2.resize(img, (self.image_width, self.image_height)))
         
         img = np.ascontiguousarray(img.astype(np.float32) / 255.0)
         
@@ -252,17 +252,8 @@ class DSECDetDataset(Dataset):
             p_valid = p[valid_mask]
             
             for i in range(len(x_valid)):
-                if p_valid[i] > 0:
-                    # Positive polarity channels
-                    time_surface[0, y_valid[i], x_valid[i]] = t_valid[i]  # Positive time surface
-                    time_surface[1, y_valid[i], x_valid[i]] += 1  # Positive event count
-                else:
-                    # Negative polarity channels
-                    time_surface[2, y_valid[i], x_valid[i]] = t_valid[i]  # Negative time surface
-                    time_surface[3, y_valid[i], x_valid[i]] += 1  # Negative event count
-                
-                # Combined time channel
-                time_surface[4, y_valid[i], x_valid[i]] = t_valid[i]  # Latest timestamp
+                polarity_idx = 1 if p_valid[i] > 0 else 0
+                time_surface[polarity_idx, y_valid[i], x_valid[i]] = t_valid[i]
         
         if self.normalize_events:
             time_surface = time_surface * 2.0 - 1.0
@@ -288,7 +279,7 @@ class DSECDetDataset(Dataset):
             if max_val > 0:
                 event_count = event_count / max_val
         
-        return torch.from_numpy(np.ascontiguousarray(event_count)).float()
+        return torch.from_numpy(event_count.copy()).float()
     
     def _create_binary_image(self, x, y, p):
         binary_image = np.zeros((2, self.image_height, self.image_width), dtype=np.float32)
@@ -303,7 +294,7 @@ class DSECDetDataset(Dataset):
                 polarity_idx = 1 if p_valid[i] > 0 else 0
                 binary_image[polarity_idx, y_valid[i], x_valid[i]] = 1.0
         
-        return torch.from_numpy(np.ascontiguousarray(binary_image)).float()
+        return torch.from_numpy(binary_image.copy()).float()
     
     def _process_tracks(self, tracks):
         if len(tracks) == 0:
@@ -337,7 +328,7 @@ class DSECDetDataset(Dataset):
     
     def _get_empty_sample(self):
         return {
-            'img': torch.zeros(5, self.image_height, self.image_width),
+            'img': torch.zeros(2, self.image_height, self.image_width),
             'img_rgb': np.zeros((self.image_height, self.image_width, 3), dtype=np.float32),
             'annot': torch.zeros(0, 5),
             'sequence': '',
