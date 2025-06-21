@@ -389,13 +389,4 @@ def evaluate(
     print(f'mAP@0.5: {total_map:.4f}')
 
     return total_map
-            plt.title(f'Precision Recall curve - {label_name}') 
-            plt.savefig(os.path.join(save_path, f'{label_name}_precision_recall.jpg'))
-            plt.close()
 
-    print('\nOverall mAP:')
-    mAP_values = [ap[0] for ap in average_precisions.values()]
-    total_map = np.mean(mAP_values) if mAP_values else 0.0
-    print(f'mAP@0.5: {total_map:.4f}')
-
-    return total_map

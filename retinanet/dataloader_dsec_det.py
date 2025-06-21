@@ -181,7 +181,7 @@ class DSECDetDataset(Dataset):
         if img.shape[:2] != (self.image_height, self.image_width):
             img = cv2.resize(img, (self.image_width, self.image_height))
         
-        img = img.astype(np.float32) / 255.0
+        img = np.ascontiguousarray(img.astype(np.float32) / 255.0)
         
         return img
     
@@ -192,10 +192,10 @@ class DSECDetDataset(Dataset):
             
             with h5py.File(events_path, 'r') as f:
                 try:
-                    events_t = f['events/t'][:].copy()
-                    events_x = f['events/x'][:].copy()
-                    events_y = f['events/y'][:].copy()
-                    events_p = f['events/p'][:].copy()
+                    events_t = np.array(f['events/t'][:], copy=True)
+                    events_x = np.array(f['events/x'][:], copy=True)
+                    events_y = np.array(f['events/y'][:], copy=True)
+                    events_p = np.array(f['events/p'][:], copy=True)
                 except Exception as read_error:
                     print(f"Error reading events data: {read_error}")
                     if "required filter" in str(read_error):
@@ -219,10 +219,10 @@ class DSECDetDataset(Dataset):
                 end_time = timestamp
                 
                 mask = (events_t >= start_time) & (events_t < end_time)
-                x = events_x[mask]
-                y = events_y[mask]
-                t = events_t[mask]
-                p = events_p[mask]
+                x = np.ascontiguousarray(events_x[mask])
+                y = np.ascontiguousarray(events_y[mask])
+                t = np.ascontiguousarray(events_t[mask])
+                p = np.ascontiguousarray(events_p[mask])
                 
         except Exception as e:
             print(f"Error loading events: {e}")
@@ -240,7 +240,7 @@ class DSECDetDataset(Dataset):
         return event_img
     
     def _create_time_surface(self, x, y, t, p):
-        time_surface = np.zeros((2, self.image_height, self.image_width), dtype=np.float32)
+        time_surface = np.zeros((5, self.image_height, self.image_width), dtype=np.float32)
         
         if len(x) > 0:
             t_normalized = (t - t.min()) / (t.max() - t.min() + 1e-6)
@@ -252,13 +252,22 @@ class DSECDetDataset(Dataset):
             p_valid = p[valid_mask]
             
             for i in range(len(x_valid)):
-                polarity_idx = 1 if p_valid[i] > 0 else 0
-                time_surface[polarity_idx, y_valid[i], x_valid[i]] = t_valid[i]
+                if p_valid[i] > 0:
+                    # Positive polarity channels
+                    time_surface[0, y_valid[i], x_valid[i]] = t_valid[i]  # Positive time surface
+                    time_surface[1, y_valid[i], x_valid[i]] += 1  # Positive event count
+                else:
+                    # Negative polarity channels
+                    time_surface[2, y_valid[i], x_valid[i]] = t_valid[i]  # Negative time surface
+                    time_surface[3, y_valid[i], x_valid[i]] += 1  # Negative event count
+                
+                # Combined time channel
+                time_surface[4, y_valid[i], x_valid[i]] = t_valid[i]  # Latest timestamp
         
         if self.normalize_events:
             time_surface = time_surface * 2.0 - 1.0
         
-        return torch.from_numpy(time_surface.copy()).float()
+        return torch.from_numpy(np.ascontiguousarray(time_surface)).float()
     
     def _create_event_count_image(self, x, y, p):
         event_count = np.zeros((2, self.image_height, self.image_width), dtype=np.float32)
@@ -279,7 +288,7 @@ class DSECDetDataset(Dataset):
             if max_val > 0:
                 event_count = event_count / max_val
         
-        return torch.from_numpy(event_count.copy()).float()
+        return torch.from_numpy(np.ascontiguousarray(event_count)).float()
     
     def _create_binary_image(self, x, y, p):
         binary_image = np.zeros((2, self.image_height, self.image_width), dtype=np.float32)
@@ -294,7 +303,7 @@ class DSECDetDataset(Dataset):
                 polarity_idx = 1 if p_valid[i] > 0 else 0
                 binary_image[polarity_idx, y_valid[i], x_valid[i]] = 1.0
         
-        return torch.from_numpy(binary_image.copy()).float()
+        return torch.from_numpy(np.ascontiguousarray(binary_image)).float()
     
     def _process_tracks(self, tracks):
         if len(tracks) == 0:
@@ -328,7 +337,7 @@ class DSECDetDataset(Dataset):
     
     def _get_empty_sample(self):
         return {
-            'img': torch.zeros(2, self.image_height, self.image_width),
+            'img': torch.zeros(5, self.image_height, self.image_width),
             'img_rgb': np.zeros((self.image_height, self.image_width, 3), dtype=np.float32),
             'annot': torch.zeros(0, 5),
             'sequence': '',
@@ -337,7 +346,7 @@ class DSECDetDataset(Dataset):
         }
     
     def _get_empty_events(self):
-        return torch.zeros(2, self.image_height, self.image_width)
+        return torch.zeros(5, self.image_height, self.image_width)
     
     def name_to_label(self, name):
         return self.classes[name]
@@ -462,11 +471,11 @@ def collater(data):
         if len(imgs[0].shape) == 3:
             max_height = max([img.shape[1] for img in imgs])
             max_width = max([img.shape[2] for img in imgs])
-            padded_imgs = torch.zeros(batch_size, imgs[0].shape[0], max_height, max_width)
+            padded_imgs = torch.zeros(batch_size, 5, max_height, max_width)
             
             for i in range(batch_size):
                 img = imgs[i]
-                padded_imgs[i, :, :img.shape[1], :img.shape[2]] = img
+                padded_imgs[i, :, :img.shape[-2], :img.shape[-1]] = img
         else:
             padded_imgs = torch.stack(imgs, dim=0)
     else:

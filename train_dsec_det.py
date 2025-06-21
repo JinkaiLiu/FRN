@@ -11,7 +11,7 @@ from retinanet import model
 from retinanet.dataloader_dsec_det import create_dsec_det_dataloader
 from retinanet import csv_eval_dsec_det
 
-assert torch.__version__.split('.')[0] == '1' 
+# assert torch.__version__.split('.')[0] == '1' 
 
 print('CUDA available: {}'.format(torch.cuda.is_available()))
 
@@ -33,7 +33,7 @@ def main(args=None):
     parser.add_argument('--dt', type=int, default=50, help='Event time window in milliseconds')
     parser.add_argument('--image_height', type=int, default=480, help='Target image height')
     parser.add_argument('--image_width', type=int, default=640, help='Target image width')
-    parser.add_argument('--use_downsampled_events', action='store_true', default=True， help='Use downsampled events (events_2x.h5)')
+    parser.add_argument('--use_downsampled_events', action='store_true', default=True, help='Use downsampled events (events_2x.h5)')
     parser.add_argument('--fusion', help='fpn_fusion, rgb, event', type=str, default='fpn_fusion')
     parser.add_argument('--depth', help='Resnet depth, must be one of 18, 34, 50', type=int, default=50) 
     parser.add_argument('--epochs', help='Number of epochs', type=int, default=60) 
