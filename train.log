@@ -1,0 +1,707 @@
+nohup: ignoring input
+CUDA available: True
+Creating DSEC-Det datasets...
+ Processing sequence: thun_00_a
+Loaded 239 timestamps
+Loaded 912 tracks
+✅ Created 239 samples for thun_00_a
+ Processing sequence: interlaken_00_c
+Loaded 537 timestamps
+Loaded 934 tracks
+✅ Created 537 samples for interlaken_00_c
+ Processing sequence: interlaken_00_d
+Loaded 1991 timestamps
+Loaded 3607 tracks
+✅ Created 1991 samples for interlaken_00_d
+ Processing sequence: interlaken_00_e
+Loaded 1991 timestamps
+Loaded 6684 tracks
+✅ Created 1991 samples for interlaken_00_e
+ Processing sequence: interlaken_00_f
+Loaded 1491 timestamps
+Loaded 6061 tracks
+✅ Created 1491 samples for interlaken_00_f
+ Processing sequence: interlaken_00_g
+Loaded 1335 timestamps
+Loaded 7039 tracks
+✅ Created 1335 samples for interlaken_00_g
+ Processing sequence: zurich_city_00_a
+Loaded 939 timestamps
+Loaded 7446 tracks
+✅ Created 939 samples for zurich_city_00_a
+ Processing sequence: zurich_city_00_b
+Loaded 1463 timestamps
+Loaded 15365 tracks
+✅ Created 1463 samples for zurich_city_00_b
+ Processing sequence: zurich_city_01_a
+Loaded 681 timestamps
+Loaded 3844 tracks
+✅ Created 681 samples for zurich_city_01_a
+ Processing sequence: zurich_city_01_b
+Loaded 1325 timestamps
+Loaded 10134 tracks
+✅ Created 1325 samples for zurich_city_01_b
+ Processing sequence: zurich_city_01_c
+Loaded 977 timestamps
+Loaded 8665 tracks
+✅ Created 977 samples for zurich_city_01_c
+ Processing sequence: zurich_city_01_d
+Loaded 795 timestamps
+Loaded 8800 tracks
+✅ Created 795 samples for zurich_city_01_d
+ Processing sequence: zurich_city_01_e
+Loaded 1991 timestamps
+Loaded 15403 tracks
+✅ Created 1991 samples for zurich_city_01_e
+ Processing sequence: zurich_city_01_f
+Loaded 1573 timestamps
+Loaded 10154 tracks
+✅ Created 1573 samples for zurich_city_01_f
+ Processing sequence: zurich_city_02_a
+Loaded 235 timestamps
+Loaded 840 tracks
+✅ Created 235 samples for zurich_city_02_a
+ Processing sequence: zurich_city_02_b
+Loaded 1225 timestamps
+Loaded 8399 tracks
+✅ Created 1225 samples for zurich_city_02_b
+ Processing sequence: zurich_city_02_c
+Loaded 2883 timestamps
+Loaded 10408 tracks
+✅ Created 2883 samples for zurich_city_02_c
+ Processing sequence: zurich_city_02_d
+Loaded 1843 timestamps
+Loaded 2463 tracks
+✅ Created 1843 samples for zurich_city_02_d
+ Processing sequence: zurich_city_02_e
+Loaded 1845 timestamps
+Loaded 6419 tracks
+✅ Created 1845 samples for zurich_city_02_e
+ Processing sequence: zurich_city_03_a
+Loaded 883 timestamps
+Loaded 246 tracks
+✅ Created 883 samples for zurich_city_03_a
+ Processing sequence: zurich_city_04_a
+Loaded 701 timestamps
+Loaded 7037 tracks
+✅ Created 701 samples for zurich_city_04_a
+ Processing sequence: zurich_city_04_b
+Loaded 269 timestamps
+Loaded 2255 tracks
+✅ Created 269 samples for zurich_city_04_b
+ Processing sequence: zurich_city_04_c
+Loaded 1181 timestamps
+Loaded 8478 tracks
+✅ Created 1181 samples for zurich_city_04_c
+ Processing sequence: zurich_city_04_d
+Loaded 957 timestamps
+Loaded 5759 tracks
+✅ Created 957 samples for zurich_city_04_d
+ Processing sequence: zurich_city_04_e
+Loaded 269 timestamps
+Loaded 2245 tracks
+✅ Created 269 samples for zurich_city_04_e
+ Processing sequence: zurich_city_04_f
+Loaded 859 timestamps
+Loaded 6107 tracks
+✅ Created 859 samples for zurich_city_04_f
+ Processing sequence: zurich_city_05_a
+Loaded 1753 timestamps
+Loaded 5873 tracks
+✅ Created 1753 samples for zurich_city_05_a
+ Processing sequence: zurich_city_05_b
+Loaded 1629 timestamps
+Loaded 7199 tracks
+✅ Created 1629 samples for zurich_city_05_b
+ Processing sequence: zurich_city_06_a
+Loaded 1523 timestamps
+Loaded 4797 tracks
+✅ Created 1523 samples for zurich_city_06_a
+ Processing sequence: zurich_city_07_a
+Loaded 1463 timestamps
+Loaded 6882 tracks
+✅ Created 1463 samples for zurich_city_07_a
+ Processing sequence: zurich_city_08_a
+Loaded 787 timestamps
+Loaded 5545 tracks
+✅ Created 787 samples for zurich_city_08_a
+ Processing sequence: zurich_city_09_a
+Loaded 1813 timestamps
+Loaded 7899 tracks
+✅ Created 1813 samples for zurich_city_09_a
+ Processing sequence: zurich_city_09_b
+Loaded 367 timestamps
+Loaded 3192 tracks
+✅ Created 367 samples for zurich_city_09_b
+ Processing sequence: zurich_city_09_c
+Loaded 1323 timestamps
+Loaded 6410 tracks
+✅ Created 1323 samples for zurich_city_09_c
+ Processing sequence: zurich_city_09_d
+Loaded 1699 timestamps
+Loaded 11250 tracks
+✅ Created 1699 samples for zurich_city_09_d
+ Processing sequence: zurich_city_09_e
+Loaded 817 timestamps
+Loaded 4144 tracks
+✅ Created 817 samples for zurich_city_09_e
+ Processing sequence: zurich_city_10_a
+Loaded 2315 timestamps
+Loaded 5606 tracks
+✅ Created 2315 samples for zurich_city_10_a
+ Processing sequence: zurich_city_10_b
+Loaded 2405 timestamps
+Loaded 10611 tracks
+✅ Created 2405 samples for zurich_city_10_b
+ Processing sequence: zurich_city_11_a
+Loaded 465 timestamps
+Loaded 3028 tracks
+✅ Created 465 samples for zurich_city_11_a
+ Processing sequence: zurich_city_11_b
+Loaded 1933 timestamps
+Loaded 8250 tracks
+✅ Created 1933 samples for zurich_city_11_b
+ Processing sequence: zurich_city_11_c
+Loaded 1957 timestamps
+Loaded 12871 tracks
+✅ Created 1957 samples for zurich_city_11_c
+Total samples loaded: 52727
+DSEC-Det Dataset: Loaded 52727 samples for train split
+ Processing sequence: zurich_city_16_a
+Loaded 1505 timestamps
+Loaded 3714 tracks
+✅ Created 1505 samples for zurich_city_16_a
+ Processing sequence: zurich_city_17_a
+Loaded 1533 timestamps
+Loaded 720 tracks
+✅ Created 1533 samples for zurich_city_17_a
+ Processing sequence: zurich_city_18_a
+Loaded 1551 timestamps
+Loaded 6177 tracks
+✅ Created 1551 samples for zurich_city_18_a
+ Processing sequence: zurich_city_19_a
+Loaded 1637 timestamps
+Loaded 4885 tracks
+✅ Created 1637 samples for zurich_city_19_a
+ Processing sequence: zurich_city_20_a
+Loaded 1687 timestamps
+Loaded 10586 tracks
+✅ Created 1687 samples for zurich_city_20_a
+ Processing sequence: zurich_city_21_a
+Loaded 2599 timestamps
+Loaded 5282 tracks
+✅ Created 2599 samples for zurich_city_21_a
+Total samples loaded: 10512
+DSEC-Det Dataset: Loaded 10512 samples for val split
+Validation dataset: 10512 samples
+ Processing sequence: thun_01_a
+Loaded 197 timestamps
+Loaded 761 tracks
+✅ Created 197 samples for thun_01_a
+ Processing sequence: thun_01_b
+Loaded 1079 timestamps
+Loaded 3504 tracks
+✅ Created 1079 samples for thun_01_b
+ Processing sequence: thun_02_a
+Loaded 3901 timestamps
+Loaded 50963 tracks
+✅ Created 3901 samples for thun_02_a
+ Processing sequence: interlaken_00_a
+Loaded 1143 timestamps
+Loaded 1682 tracks
+✅ Created 1143 samples for interlaken_00_a
+ Processing sequence: interlaken_00_b
+Loaded 1617 timestamps
+Loaded 1864 tracks
+✅ Created 1617 samples for interlaken_00_b
+ Processing sequence: interlaken_01_a
+Loaded 2263 timestamps
+Loaded 4207 tracks
+✅ Created 2263 samples for interlaken_01_a
+ Processing sequence: zurich_city_12_a
+Loaded 765 timestamps
+Loaded 2756 tracks
+✅ Created 765 samples for zurich_city_12_a
+ Processing sequence: zurich_city_13_a
+Loaded 379 timestamps
+Loaded 1497 tracks
+✅ Created 379 samples for zurich_city_13_a
+ Processing sequence: zurich_city_13_b
+Loaded 315 timestamps
+Loaded 2667 tracks
+✅ Created 315 samples for zurich_city_13_b
+ Processing sequence: zurich_city_14_a
+Loaded 439 timestamps
+Loaded 2124 tracks
+✅ Created 439 samples for zurich_city_14_a
+ Processing sequence: zurich_city_14_b
+Loaded 577 timestamps
+Loaded 2981 tracks
+✅ Created 577 samples for zurich_city_14_b
+ Processing sequence: zurich_city_14_c
+Loaded 1191 timestamps
+Loaded 5651 tracks
+✅ Created 1191 samples for zurich_city_14_c
+ Processing sequence: zurich_city_15_a
+Loaded 1239 timestamps
+Loaded 8836 tracks
+✅ Created 1239 samples for zurich_city_15_a
+Total samples loaded: 15105
+DSEC-Det Dataset: Loaded 15105 samples for test split
+Test dataset: 15105 samples
+Training dataset: 52727 samples
+Number of classes: 8
+Classes: ['pedestrian', 'rider', 'car', 'bus', 'truck', 'bicycle', 'motorcycle', 'train']
+Starting training with fpn_fusion fusion...
+0m 0s
+[DSEC-Det fpn_fusion] [7m 38s], Epoch: 0 | Iteration: 0 | Classification loss: 1.17464 | Regression loss: 1.06675 | Running loss: 2.24139
+Warning: Loss is 128270.8515625, skipping iteration
+Warning: Loss is 44147.6640625, skipping iteration
+Warning: Loss is 1843.35693359375, skipping iteration
+Warning: Loss is 3439.453857421875, skipping iteration
+Warning: Loss is 75545.4609375, skipping iteration
+Warning: Loss is 2706.308349609375, skipping iteration
+Warning: Loss is 14969.1787109375, skipping iteration
+Warning: Loss is 7165.37451171875, skipping iteration
+Warning: Loss is 105639.390625, skipping iteration
+Warning: Loss is 2396.301513671875, skipping iteration
+Warning: Loss is 11197.193359375, skipping iteration
+Warning: Loss is 4053.81689453125, skipping iteration
+Warning: Loss is 420162.34375, skipping iteration
+Warning: Loss is 5444.8916015625, skipping iteration
+Warning: Loss is 7942.37060546875, skipping iteration
+Warning: Loss is 2552.529296875, skipping iteration
+Warning: Loss is 4661.28759765625, skipping iteration
+Warning: Loss is 15425.0263671875, skipping iteration
+[DSEC-Det fpn_fusion] [85m 23s], Epoch: 0 | Iteration: 20 | Classification loss: 1.16995 | Regression loss: 1.07923 | Running loss: 2.24918
+Warning: Loss is 2456.487548828125, skipping iteration
+Warning: Loss is 1993.6727294921875, skipping iteration
+Warning: Loss is 2092.887451171875, skipping iteration
+Warning: Loss is 2573.703369140625, skipping iteration
+Warning: Loss is 13623.552734375, skipping iteration
+Warning: Loss is 3859.73095703125, skipping iteration
+Warning: Loss is 4705.08251953125, skipping iteration
+Warning: Loss is 433386.34375, skipping iteration
+Warning: Loss is 363539.6875, skipping iteration
+Warning: Loss is 351179.3125, skipping iteration
+Warning: Loss is 8457.44921875, skipping iteration
+Warning: Loss is 8349.42578125, skipping iteration
+Warning: Loss is 11979.9013671875, skipping iteration
+Warning: Loss is 3731.750244140625, skipping iteration
+Warning: Loss is 16924.720703125, skipping iteration
+Warning: Loss is 5183.45263671875, skipping iteration
+[DSEC-Det fpn_fusion] [145m 12s], Epoch: 0 | Iteration: 40 | Classification loss: 1.09063 | Regression loss: 0.76211 | Running loss: 1.85274
+Warning: Loss is 1629.877197265625, skipping iteration
+Warning: Loss is 6660.16357421875, skipping iteration
+Warning: Loss is 3030.0478515625, skipping iteration
+Warning: Loss is 2338.3525390625, skipping iteration
+Warning: Loss is 3690.602294921875, skipping iteration
+Warning: Loss is 3829.099365234375, skipping iteration
+Warning: Loss is 13567.234375, skipping iteration
+Warning: Loss is 7150.818359375, skipping iteration
+Warning: Loss is 13267.8408203125, skipping iteration
+Warning: Loss is 4100.5634765625, skipping iteration
+Warning: Loss is 12173.3154296875, skipping iteration
+Warning: Loss is 6468.86572265625, skipping iteration
+Warning: Loss is 4849.3720703125, skipping iteration
+Warning: Loss is 2946.921630859375, skipping iteration
+Warning: Loss is 15886.318359375, skipping iteration
+Warning: Loss is 3991.168212890625, skipping iteration
+Warning: Loss is 11235.470703125, skipping iteration
+Warning: Loss is 23469.716796875, skipping iteration
+Warning: Loss is 12204.5927734375, skipping iteration
+Warning: Loss is 37298.203125, skipping iteration
+Warning: Loss is 4755.6396484375, skipping iteration
+Warning: Loss is 11663.3740234375, skipping iteration
+Warning: Loss is 20375.798828125, skipping iteration
+Warning: Loss is 4207.26806640625, skipping iteration
+Warning: Loss is 11171.4140625, skipping iteration
+Warning: Loss is 4052.00244140625, skipping iteration
+Warning: Loss is 9493.994140625, skipping iteration
+Warning: Loss is 6206.9287109375, skipping iteration
+Warning: Loss is 12327.5595703125, skipping iteration
+Warning: Loss is 10468.9951171875, skipping iteration
+Warning: Loss is 4766.4384765625, skipping iteration
+Warning: Loss is 3707.338623046875, skipping iteration
+Warning: Loss is 13547.392578125, skipping iteration
+[DSEC-Det fpn_fusion] [262m 42s], Epoch: 0 | Iteration: 80 | Classification loss: 4.81289 | Regression loss: 0.00000 | Running loss: 3.49118
+Warning: Loss is 10299.466796875, skipping iteration
+Warning: Loss is 5637.11083984375, skipping iteration
+Warning: Loss is 9023.7421875, skipping iteration
+Warning: Loss is 10765.78125, skipping iteration
+Warning: Loss is 3905.35986328125, skipping iteration
+Warning: Loss is 60824.4296875, skipping iteration
+Warning: Loss is 9188.3017578125, skipping iteration
+Warning: Loss is 1023302.6875, skipping iteration
+Warning: Loss is 40660.22265625, skipping iteration
+[DSEC-Det fpn_fusion] [274m 7s], Epoch: 0 | Iteration: 90 | Classification loss: 1.10211 | Regression loss: 0.68720 | Running loss: 1.78931
+Warning: Loss is 7083.0966796875, skipping iteration
+Warning: Loss is 117771.8828125, skipping iteration
+Warning: Loss is 27173.6328125, skipping iteration
+Warning: Loss is 19578.435546875, skipping iteration
+Warning: Loss is 16017.703125, skipping iteration
+Warning: Loss is 31908.26171875, skipping iteration
+Warning: Loss is 8350.251953125, skipping iteration
+Warning: Loss is 1043307.0, skipping iteration
+Warning: Loss is 11671.01953125, skipping iteration
+Warning: Loss is 9902.9580078125, skipping iteration
+Warning: Loss is 36027.90234375, skipping iteration
+Warning: Loss is 14523.8154296875, skipping iteration
+Warning: Loss is 12973.3740234375, skipping iteration
+Warning: Loss is 15923.9150390625, skipping iteration
+Warning: Loss is 7700.01171875, skipping iteration
+Warning: Loss is 10194.7919921875, skipping iteration
+Warning: Loss is 88339.6171875, skipping iteration
+Warning: Loss is 33112.140625, skipping iteration
+Warning: Loss is 5720.44482421875, skipping iteration
+Warning: Loss is 4905.435546875, skipping iteration
+Warning: Loss is 12249.09765625, skipping iteration
+Warning: Loss is 33109.828125, skipping iteration
+Warning: Loss is 3825.359375, skipping iteration
+Warning: Loss is 16071.6513671875, skipping iteration
+Warning: Loss is 9515.62109375, skipping iteration
+Warning: Loss is 17110.076171875, skipping iteration
+Warning: Loss is 6042.58740234375, skipping iteration
+Warning: Loss is 9569.9267578125, skipping iteration
+Warning: Loss is 1052028.75, skipping iteration
+Warning: Loss is 16569.546875, skipping iteration
+Warning: Loss is 11425.419921875, skipping iteration
+Warning: Loss is 8929.4169921875, skipping iteration
+Warning: Loss is 5865.935546875, skipping iteration
+Warning: Loss is 1051569.75, skipping iteration
+Warning: Loss is 37253.2578125, skipping iteration
+Warning: Loss is 11136.76953125, skipping iteration
+Warning: Loss is 33643.64453125, skipping iteration
+Warning: Loss is 6585.0693359375, skipping iteration
+Warning: Loss is 8521.2333984375, skipping iteration
+Warning: Loss is 36388.76953125, skipping iteration
+Warning: Loss is 27569.640625, skipping iteration
+Warning: Loss is 1216257.75, skipping iteration
+Warning: Loss is 12056.3623046875, skipping iteration
+Warning: Loss is 70913.96875, skipping iteration
+Warning: Loss is 24691.357421875, skipping iteration
+Warning: Loss is 9468.55078125, skipping iteration
+Warning: Loss is 36591.7734375, skipping iteration
+Warning: Loss is 7416.6953125, skipping iteration
+Warning: Loss is 7005.58203125, skipping iteration
+Warning: Loss is 6757.38916015625, skipping iteration
+Warning: Loss is 15640.1689453125, skipping iteration
+Warning: Loss is 38740.19140625, skipping iteration
+Warning: Loss is 14672.1728515625, skipping iteration
+Warning: Loss is 18342.134765625, skipping iteration
+Warning: Loss is 13879.4462890625, skipping iteration
+Warning: Loss is 6519.7431640625, skipping iteration
+Warning: Loss is 6963.4208984375, skipping iteration
+Warning: Loss is 9721.7314453125, skipping iteration
+Warning: Loss is 12272.15234375, skipping iteration
+Warning: Loss is 49260.53125, skipping iteration
+Warning: Loss is 17673.23046875, skipping iteration
+Warning: Loss is 6882.6806640625, skipping iteration
+Warning: Loss is 12447.3076171875, skipping iteration
+[DSEC-Det fpn_fusion] [473m 34s], Epoch: 0 | Iteration: 170 | Classification loss: 0.85593 | Regression loss: 1.08290 | Running loss: 1.93883
+Warning: Loss is 11967.6494140625, skipping iteration
+Warning: Loss is 7202.10888671875, skipping iteration
+Warning: Loss is 12043.236328125, skipping iteration
+Warning: Loss is 1693629.25, skipping iteration
+Warning: Loss is 10994.85546875, skipping iteration
+Warning: Loss is 73100.0546875, skipping iteration
+Warning: Loss is 55465.33203125, skipping iteration
+Warning: Loss is 22581.34765625, skipping iteration
+Warning: Loss is 27983.412109375, skipping iteration
+Warning: Loss is 19552.29296875, skipping iteration
+Warning: Loss is 44324.8359375, skipping iteration
+Warning: Loss is 1783913.0, skipping iteration
+Warning: Loss is 15358.3984375, skipping iteration
+Warning: Loss is 145790.84375, skipping iteration
+Warning: Loss is 8811.2568359375, skipping iteration
+Warning: Loss is 1850698.375, skipping iteration
+Warning: Loss is 17012.396484375, skipping iteration
+Warning: Loss is 6827.74755859375, skipping iteration
+Warning: Loss is 13807.712890625, skipping iteration
+Warning: Loss is 155740.953125, skipping iteration
+Warning: Loss is 6797.8662109375, skipping iteration
+Warning: Loss is 11742.1689453125, skipping iteration
+Warning: Loss is 1800692.75, skipping iteration
+Warning: Loss is 7043.4130859375, skipping iteration
+Warning: Loss is 25447.474609375, skipping iteration
+Warning: Loss is 1788229.75, skipping iteration
+Warning: Loss is 28931.40625, skipping iteration
+Warning: Loss is 932452.125, skipping iteration
+Warning: Loss is 32083.595703125, skipping iteration
+Warning: Loss is 917637.5625, skipping iteration
+Warning: Loss is 6874.0693359375, skipping iteration
+Warning: Loss is 20219.0546875, skipping iteration
+Warning: Loss is 24169.123046875, skipping iteration
+Warning: Loss is 12248.2021484375, skipping iteration
+Warning: Loss is 29106.916015625, skipping iteration
+Warning: Loss is 1828356.5, skipping iteration
+Warning: Loss is 46441.203125, skipping iteration
+Warning: Loss is 24517.380859375, skipping iteration
+Warning: Loss is 26130.77734375, skipping iteration
+Warning: Loss is 18153.197265625, skipping iteration
+Warning: Loss is 8695.9765625, skipping iteration
+Warning: Loss is 22553.802734375, skipping iteration
+Warning: Loss is 11993.2666015625, skipping iteration
+Warning: Loss is 1935213.25, skipping iteration
+Warning: Loss is 10913.2841796875, skipping iteration
+Warning: Loss is 31213.255859375, skipping iteration
+Warning: Loss is 16666.10546875, skipping iteration
+Warning: Loss is 1857650.875, skipping iteration
+Warning: Loss is 188983.78125, skipping iteration
+Warning: Loss is 60165.3515625, skipping iteration
+Warning: Loss is 32690.94921875, skipping iteration
+Warning: Loss is 46246.23828125, skipping iteration
+Warning: Loss is 45166.77734375, skipping iteration
+Warning: Loss is 1903557.25, skipping iteration
+Warning: Loss is 7634.5703125, skipping iteration
+Warning: Loss is 19556.974609375, skipping iteration
+Warning: Loss is 1948837.0, skipping iteration
+Warning: Loss is 27353.361328125, skipping iteration
+Warning: Loss is 33604.9921875, skipping iteration
+Warning: Loss is 10904.337890625, skipping iteration
+Warning: Loss is 45262.82421875, skipping iteration
+Warning: Loss is 14422.3623046875, skipping iteration
+[DSEC-Det fpn_fusion] [579m 17s], Epoch: 0 | Iteration: 240 | Classification loss: 0.76540 | Regression loss: 1.08484 | Running loss: 1.85024
+Warning: Loss is 40870.65234375, skipping iteration
+Warning: Loss is 109740.4296875, skipping iteration
+Warning: Loss is 204089.640625, skipping iteration
+Warning: Loss is 11371.7373046875, skipping iteration
+Warning: Loss is 12150.251953125, skipping iteration
+Warning: Loss is 61504.4296875, skipping iteration
+Warning: Loss is 9087.4580078125, skipping iteration
+Warning: Loss is 45585.89453125, skipping iteration
+Warning: Loss is 100292.65625, skipping iteration
+Warning: Loss is 43058.7890625, skipping iteration
+Warning: Loss is 123646.078125, skipping iteration
+Warning: Loss is 9711.1513671875, skipping iteration
+Warning: Loss is 92382.3125, skipping iteration
+Warning: Loss is 2123064.25, skipping iteration
+Warning: Loss is 12015.181640625, skipping iteration
+Warning: Loss is 35092.859375, skipping iteration
+Warning: Loss is 8053.32275390625, skipping iteration
+Warning: Loss is 55839.296875, skipping iteration
+Warning: Loss is 11919.001953125, skipping iteration
+Warning: Loss is 45154.35546875, skipping iteration
+Warning: Loss is 8959.513671875, skipping iteration
+Warning: Loss is 7950.0546875, skipping iteration
+Warning: Loss is 10788.248046875, skipping iteration
+Warning: Loss is 29247.955078125, skipping iteration
+Warning: Loss is 7440.24609375, skipping iteration
+Warning: Loss is 16206.9638671875, skipping iteration
+Warning: Loss is 13703.130859375, skipping iteration
+Warning: Loss is 13554.7421875, skipping iteration
+Warning: Loss is 71404.8046875, skipping iteration
+Warning: Loss is 56262.671875, skipping iteration
+Warning: Loss is 20151.296875, skipping iteration
+Warning: Loss is 151172.453125, skipping iteration
+Warning: Loss is 77416.484375, skipping iteration
+Warning: Loss is 33765.84375, skipping iteration
+Warning: Loss is 76572.375, skipping iteration
+Warning: Loss is 2122273.5, skipping iteration
+Warning: Loss is 18297.9453125, skipping iteration
+Warning: Loss is 31274.248046875, skipping iteration
+Warning: Loss is 55467.09375, skipping iteration
+Warning: Loss is 7236.04296875, skipping iteration
+[DSEC-Det fpn_fusion] [668m 20s], Epoch: 0 | Iteration: 290 | Classification loss: 0.87159 | Regression loss: 0.92370 | Running loss: 1.86906
+Warning: Loss is 2275627.0, skipping iteration
+Warning: Loss is 33773.1796875, skipping iteration
+Warning: Loss is 8264.7490234375, skipping iteration
+Warning: Loss is 29121.27734375, skipping iteration
+Warning: Loss is 96392.109375, skipping iteration
+Warning: Loss is 11724.09765625, skipping iteration
+Warning: Loss is 94680.578125, skipping iteration
+Warning: Loss is 2265177.25, skipping iteration
+Warning: Loss is 29172.43359375, skipping iteration
+Warning: Loss is 12013.1171875, skipping iteration
+Warning: Loss is 13257.015625, skipping iteration
+Warning: Loss is 10306.67578125, skipping iteration
+Warning: Loss is 18353.244140625, skipping iteration
+Warning: Loss is 53317.375, skipping iteration
+Warning: Loss is 13534.8642578125, skipping iteration
+Warning: Loss is 54839.9921875, skipping iteration
+Warning: Loss is 76489.4765625, skipping iteration
+Warning: Loss is 14088.486328125, skipping iteration
+[DSEC-Det fpn_fusion] [703m 14s], Epoch: 0 | Iteration: 310 | Classification loss: 1.47821 | Regression loss: 1.09683 | Running loss: 2.57504
+Warning: Loss is 20122.1796875, skipping iteration
+Warning: Loss is 27832.498046875, skipping iteration
+Warning: Loss is 5521.95703125, skipping iteration
+Warning: Loss is 85516.65625, skipping iteration
+Warning: Loss is 23512.240234375, skipping iteration
+Warning: Loss is 14312.732421875, skipping iteration
+Warning: Loss is 14177.6787109375, skipping iteration
+Warning: Loss is 14033.3046875, skipping iteration
+Warning: Loss is 19669.955078125, skipping iteration
+Warning: Loss is 37792.98046875, skipping iteration
+Warning: Loss is 2309300.0, skipping iteration
+Warning: Loss is 10965.6171875, skipping iteration
+Warning: Loss is 49660.96875, skipping iteration
+Warning: Loss is 39722.73046875, skipping iteration
+Warning: Loss is 7744.28466796875, skipping iteration
+Warning: Loss is 16463.95703125, skipping iteration
+Warning: Loss is 39026.94140625, skipping iteration
+Warning: Loss is 26010.0234375, skipping iteration
+Warning: Loss is 2181650.0, skipping iteration
+Warning: Loss is 21774.462890625, skipping iteration
+Warning: Loss is 43899.45703125, skipping iteration
+Warning: Loss is 19693.892578125, skipping iteration
+Warning: Loss is 82011.5, skipping iteration
+Warning: Loss is 9381.810546875, skipping iteration
+Warning: Loss is 19431.763671875, skipping iteration
+Warning: Loss is 11316.859375, skipping iteration
+Warning: Loss is 26126.46875, skipping iteration
+Warning: Loss is 17952.263671875, skipping iteration
+Warning: Loss is 22154.16015625, skipping iteration
+Warning: Loss is 71151.2734375, skipping iteration
+Warning: Loss is 30243.953125, skipping iteration
+Warning: Loss is 23112.2578125, skipping iteration
+Warning: Loss is 88315.03125, skipping iteration
+Warning: Loss is 48860.796875, skipping iteration
+Warning: Loss is 14333.529296875, skipping iteration
+Warning: Loss is 50315.55859375, skipping iteration
+Warning: Loss is 29347.58984375, skipping iteration
+Warning: Loss is 58565.203125, skipping iteration
+Warning: Loss is 2128341.0, skipping iteration
+Warning: Loss is 11774.1826171875, skipping iteration
+Warning: Loss is 11174.388671875, skipping iteration
+Warning: Loss is 15211.7236328125, skipping iteration
+Warning: Loss is 7996.7451171875, skipping iteration
+Warning: Loss is 8471.3115234375, skipping iteration
+Warning: Loss is 13939.83984375, skipping iteration
+Warning: Loss is 21626.966796875, skipping iteration
+Warning: Loss is 65142.8515625, skipping iteration
+Warning: Loss is 14731.2548828125, skipping iteration
+Warning: Loss is 23105.845703125, skipping iteration
+Warning: Loss is 74316.3203125, skipping iteration
+Warning: Loss is 8857.2373046875, skipping iteration
+Warning: Loss is 10232.373046875, skipping iteration
+Warning: Loss is 10604.7041015625, skipping iteration
+Warning: Loss is 1998592.5, skipping iteration
+Warning: Loss is 69150.3203125, skipping iteration
+Warning: Loss is 14447.013671875, skipping iteration
+Warning: Loss is 54630.2734375, skipping iteration
+Warning: Loss is 14526.1875, skipping iteration
+Warning: Loss is 11386.7919921875, skipping iteration
+Warning: Loss is 26579.443359375, skipping iteration
+Warning: Loss is 14425.458984375, skipping iteration
+Warning: Loss is 11501.244140625, skipping iteration
+Warning: Loss is 20427.59375, skipping iteration
+Warning: Loss is 58406.7578125, skipping iteration
+Warning: Loss is 22682.67578125, skipping iteration
+Warning: Loss is 28776.576171875, skipping iteration
+Warning: Loss is 8284.4306640625, skipping iteration
+Warning: Loss is 1999039.5, skipping iteration
+Warning: Loss is 8023.40625, skipping iteration
+Warning: Loss is 15762.7705078125, skipping iteration
+Warning: Loss is 1958747.0, skipping iteration
+Warning: Loss is 9872.8056640625, skipping iteration
+Warning: Loss is 29976.71875, skipping iteration
+Warning: Loss is 2029459.25, skipping iteration
+Warning: Loss is 31635.0546875, skipping iteration
+Warning: Loss is 2040822.0, skipping iteration
+Warning: Loss is 215070.328125, skipping iteration
+Warning: Loss is 7670.4365234375, skipping iteration
+Warning: Loss is 2013736.25, skipping iteration
+Warning: Loss is 51433.453125, skipping iteration
+Warning: Loss is 8458.0849609375, skipping iteration
+Warning: Loss is 10954.6025390625, skipping iteration
+Warning: Loss is 144428.15625, skipping iteration
+Warning: Loss is 62526.5546875, skipping iteration
+Warning: Loss is 10628.5791015625, skipping iteration
+Warning: Loss is 73044.8828125, skipping iteration
+[DSEC-Det fpn_fusion] [816m 59s], Epoch: 0 | Iteration: 410 | Classification loss: 0.71458 | Regression loss: 1.01245 | Running loss: 1.72703
+Warning: Loss is 1879303.625, skipping iteration
+Warning: Loss is 6025.89501953125, skipping iteration
+Warning: Loss is 16504.30859375, skipping iteration
+Warning: Loss is 19775.77734375, skipping iteration
+Warning: Loss is 12609.8125, skipping iteration
+Warning: Loss is 9540.353515625, skipping iteration
+Warning: Loss is 58820.84375, skipping iteration
+Warning: Loss is 18101.798828125, skipping iteration
+Warning: Loss is 13829.0869140625, skipping iteration
+Warning: Loss is 21555.568359375, skipping iteration
+Warning: Loss is 11296.2001953125, skipping iteration
+Warning: Loss is 7246.82373046875, skipping iteration
+Warning: Loss is 8159.18017578125, skipping iteration
+Warning: Loss is 17056.69140625, skipping iteration
+Warning: Loss is 9909.841796875, skipping iteration
+Warning: Loss is 6511.22265625, skipping iteration
+Warning: Loss is 17244.431640625, skipping iteration
+Warning: Loss is 21147.2109375, skipping iteration
+Warning: Loss is 29653.740234375, skipping iteration
+Warning: Loss is 10698.8173828125, skipping iteration
+Warning: Loss is 14386.599609375, skipping iteration
+Warning: Loss is 12045.552734375, skipping iteration
+Warning: Loss is 61267.1640625, skipping iteration
+Warning: Loss is 7035.67529296875, skipping iteration
+Warning: Loss is 2185597.0, skipping iteration
+Warning: Loss is 14282.255859375, skipping iteration
+Warning: Loss is 64775.09765625, skipping iteration
+Warning: Loss is 163338.5625, skipping iteration
+Warning: Loss is 132744.265625, skipping iteration
+Warning: Loss is 2573031.5, skipping iteration
+Warning: Loss is 34591.09375, skipping iteration
+Warning: Loss is 52289.1875, skipping iteration
+Warning: Loss is 48653.0546875, skipping iteration
+Warning: Loss is 10246.0810546875, skipping iteration
+Warning: Loss is 55103.4921875, skipping iteration
+Warning: Loss is 10564.49609375, skipping iteration
+Warning: Loss is 2162175.0, skipping iteration
+Warning: Loss is 42020.07421875, skipping iteration
+Warning: Loss is 90901.953125, skipping iteration
+Warning: Loss is 2357257.5, skipping iteration
+Warning: Loss is 28575.5234375, skipping iteration
+Warning: Loss is 76951.546875, skipping iteration
+Warning: Loss is 19610.775390625, skipping iteration
+Warning: Loss is 2297148.75, skipping iteration
+Warning: Loss is 2623247.0, skipping iteration
+Warning: Loss is 16960.56640625, skipping iteration
+Warning: Loss is 21437.09765625, skipping iteration
+Warning: Loss is 77991.0078125, skipping iteration
+Warning: Loss is 14742.974609375, skipping iteration
+Warning: Loss is 24125.564453125, skipping iteration
+Warning: Loss is 8275.318359375, skipping iteration
+Warning: Loss is 71420.0078125, skipping iteration
+Warning: Loss is 261484.3125, skipping iteration
+Warning: Loss is 48936.5703125, skipping iteration
+Warning: Loss is 11140.28125, skipping iteration
+Warning: Loss is 70536.0234375, skipping iteration
+Warning: Loss is 13938.1982421875, skipping iteration
+Warning: Loss is 53299.40625, skipping iteration
+Warning: Loss is 74307.3203125, skipping iteration
+Warning: Loss is 2743900.25, skipping iteration
+Warning: Loss is 16577.052734375, skipping iteration
+Warning: Loss is 2791854.0, skipping iteration
+Warning: Loss is 80993.34375, skipping iteration
+[DSEC-Det fpn_fusion] [932m 48s], Epoch: 0 | Iteration: 490 | Classification loss: 0.83596 | Regression loss: 0.87834 | Running loss: 1.71430
+Warning: Loss is 9653.833984375, skipping iteration
+Warning: Loss is 122238.4609375, skipping iteration
+Warning: Loss is 17918.271484375, skipping iteration
+Warning: Loss is 11135.810546875, skipping iteration
+Warning: Loss is 19172.86328125, skipping iteration
+Warning: Loss is 115450.375, skipping iteration
+Warning: Loss is 42419.6796875, skipping iteration
+Warning: Loss is 25546.845703125, skipping iteration
+Warning: Loss is 29382.46875, skipping iteration
+Warning: Loss is 111137.8359375, skipping iteration
+Warning: Loss is 41480.6484375, skipping iteration
+Warning: Loss is 201630.546875, skipping iteration
+Warning: Loss is 45249.0078125, skipping iteration
+Warning: Loss is 24537.39453125, skipping iteration
+Warning: Loss is 27221.849609375, skipping iteration
+Warning: Loss is 36204.765625, skipping iteration
+[DSEC-Det fpn_fusion] [953m 25s], Epoch: 0 | Iteration: 510 | Classification loss: 0.84842 | Regression loss: 1.03310 | Running loss: 1.88152
+Warning: Loss is 59732.171875, skipping iteration
+Warning: Loss is 513062.25, skipping iteration
+Warning: Loss is 100763.3671875, skipping iteration
+Warning: Loss is 49589.10546875, skipping iteration
+Warning: Loss is 18553.31640625, skipping iteration
+Warning: Loss is 37206.77734375, skipping iteration
+Warning: Loss is 41816.2421875, skipping iteration
+Warning: Loss is 25883.466796875, skipping iteration
+Warning: Loss is 47259.4921875, skipping iteration
+Warning: Loss is 119104.421875, skipping iteration
+Warning: Loss is 104838.90625, skipping iteration
+Warning: Loss is 24884.1640625, skipping iteration
+Warning: Loss is 14346.0673828125, skipping iteration
+Warning: Loss is 2870419.5, skipping iteration
+Warning: Loss is 38141.40234375, skipping iteration

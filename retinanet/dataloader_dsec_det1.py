@@ -192,19 +192,19 @@ class DSECDetDataset(Dataset):
             
             with h5py.File(events_path, 'r') as f:
                 try:
-                    events_t = np.array(f['events/t'][:], copy=True)
-                    events_x = np.array(f['events/x'][:], copy=True)
-                    events_y = np.array(f['events/y'][:], copy=True)
-                    events_p = np.array(f['events/p'][:], copy=True)
+                    events_t = np.ascontiguousarray(f['events/t'][:])
+                    events_x = np.ascontiguousarray(f['events/x'][:])
+                    events_y = np.ascontiguousarray(f['events/y'][:])
+                    events_p = np.ascontiguousarray(f['events/p'][:])
                 except Exception as read_error:
                     print(f"Error reading events data: {read_error}")
                     if "required filter" in str(read_error):
                         print("This appears to be a compression issue. Trying alternative approach...")
                         try:
-                            events_t = np.array(f['events/t'])
-                            events_x = np.array(f['events/x'])
-                            events_y = np.array(f['events/y'])
-                            events_p = np.array(f['events/p'])
+                            events_t = np.ascontiguousarray(f['events/t'][:])
+                            events_x = np.ascontiguousarray(f['events/x'][:])
+                            events_y = np.ascontiguousarray(f['events/y'][:])
+                            events_p = np.ascontiguousarray(f['events/p'][:])
                         except:
                             raise read_error
                     else:
@@ -398,7 +398,7 @@ class Resizer(object):
         if len(annots) > 0:
             annots[:, :4] *= scale
 
-        return {'img': sample['img'], 'img_rgb': torch.from_numpy(image.astype(np.float32)), 'annot': torch.from_numpy(annots), 'scale': scale}
+        return {'img': sample['img'], 'img_rgb': torch.from_numpy(np.ascontiguousarray(image.astype(np.float32))), 'annot': torch.from_numpy(np.ascontiguousarray(annots)), 'scale': scale}
 
 class Normalizer(object):
     def __init__(self, dataset_name='dsec'):
@@ -416,7 +416,7 @@ class Normalizer(object):
         if isinstance(image, torch.Tensor):
             image = image.numpy()
 
-        return {'img': sample['img'],'img_rgb': torch.from_numpy(((image.astype(np.float32)-self.mean)/self.std)), 'annot': annots}
+        return {'img': sample['img'],'img_rgb': torch.from_numpy(np.ascontiguousarray((image.astype(np.float32)-self.mean)/self.std)), 'annot': annots}
 
 class Augmenter(object):
     def __call__(self, sample, flip_x=0.5):
@@ -446,7 +446,7 @@ class Augmenter(object):
                 annots[:, 0] = cols - x2
                 annots[:, 2] = cols - x_tmp
 
-            sample = {'img': torch.from_numpy(image_event), 'img_rgb': torch.from_numpy(image_rgb), 'annot': torch.from_numpy(annots)}
+            sample = {'img': torch.from_numpy(np.ascontiguousarray(image_event)), 'img_rgb': torch.from_numpy(np.ascontiguousarray(image_rgb)), 'annot': torch.from_numpy(np.ascontiguousarray(annots))}
 
         return sample
 
