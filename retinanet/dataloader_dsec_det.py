@@ -71,7 +71,7 @@ def improved_process_tracks(tracks, image_width, image_height, classes):
 
 
 def create_robust_event_representation(x, y, t, p, image_height, image_width, normalize_events=True):
-    channels = 2  
+    channels = 5  
     time_surface = np.zeros((channels, image_height, image_width), dtype=np.float32)
     
     if len(x) == 0:
@@ -330,7 +330,7 @@ class DSECDetDataset(Dataset):
     
     def _get_empty_sample(self):
         return {
-            'img': torch.zeros(2, self.image_height, self.image_width),
+            'img': torch.zeros(5, self.image_height, self.image_width),
             'img_rgb': np.zeros((self.image_height, self.image_width, 3), dtype=np.float32),
             'annot': torch.zeros(0, 5),
             'sequence': '',
@@ -339,7 +339,7 @@ class DSECDetDataset(Dataset):
         }
     
     def _get_empty_events(self):
-        return torch.zeros(2, self.image_height, self.image_width)
+        return torch.zeros(5, self.image_height, self.image_width)
     
     def name_to_label(self, name):
         return self.classes[name]
@@ -627,7 +627,8 @@ def create_dsec_det_dataloader(root_dir, split='train', batch_size=8, num_worker
             dataset,
             batch_sampler=sampler,
             collate_fn=collater,
-            num_workers=num_workers
+            num_workers=num_workers,
+            pin_memory=torch.cuda.is_available()
         )
     else:
         dataloader = DataLoader(

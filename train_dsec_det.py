@@ -144,7 +144,7 @@ def safe_training_step(retinanet, data, optimizer, iter_num, loss_threshold=50.0
             
         if total_loss.item() > loss_threshold:
             print(f"Iter {iter_num}: Loss {total_loss.item():.1f} > threshold {loss_threshold}")
-            return None, None, None
+            #return None, None, None
         
         # 反向传播
         optimizer.zero_grad()
@@ -152,9 +152,9 @@ def safe_training_step(retinanet, data, optimizer, iter_num, loss_threshold=50.0
         
         # 梯度裁剪
         grad_norm = torch.nn.utils.clip_grad_norm_(retinanet.parameters(), 1.0)
-        if grad_norm > 10.0:
-            print(f"Iter {iter_num}: Large gradient norm {grad_norm:.3f}")
-            return None, None, None
+        #if grad_norm > 10.0:
+            #print(f"Iter {iter_num}: Large gradient norm {grad_norm:.3f}")
+            #return None, None, None
         
         optimizer.step()
         
@@ -224,7 +224,7 @@ def main():
     
     # 训练参数  
     parser.add_argument('--epochs', type=int, default=60, help='Number of epochs')
-    parser.add_argument('--learning_rate', type=float, default=1e-5, help='Learning rate')
+    parser.add_argument('--learning_rate', type=float, default=5e-5, help='Learning rate')
     parser.add_argument('--loss_threshold', type=float, default=50.0, help='Loss threshold for filtering')
     
     # 模型参数
