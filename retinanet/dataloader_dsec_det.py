@@ -444,8 +444,8 @@ class Augmenter(object):
             if isinstance(annots, torch.Tensor):
                 annots = annots.numpy()
             
-            image_rgb = image_rgb[:, ::-1, :]
-            image_event = image_event[:, :, ::-1]
+            image_rgb = np.ascontiguousarray(image_rgb[:, ::-1, :].copy())
+            image_event = np.ascontiguousarray(image_event[:, :, ::-1].copy())
 
             rows, cols, channels = image_rgb.shape
 
