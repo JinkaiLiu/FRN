@@ -4,7 +4,6 @@ import os
 import torch
 import numpy as np
 import random
-# import h5py
 from torch.utils.data import Dataset, DataLoader
 from torch.utils.data.sampler import Sampler
 from PIL import Image
@@ -28,6 +27,101 @@ try:
 except ImportError:
     SKIMAGE_AVAILABLE = False
     import cv2
+
+
+def improved_process_tracks(tracks, image_width, image_height, classes):
+    if len(tracks) == 0:
+        return torch.zeros((0, 5), dtype=torch.float32)
+    
+    annotations = []
+    for track in tracks:
+        try:
+            x = float(track['x'])
+            y = float(track['y']) 
+            w = float(track['w'])
+            h = float(track['h'])
+            class_id = int(track['class_id'])
+            
+            if w <= 0 or h <= 0:
+                continue
+                
+            if class_id < 0 or class_id >= len(classes):
+                continue
+            
+            x1 = max(0, min(x, image_width - 1))
+            y1 = max(0, min(y, image_height - 1))
+            x2 = max(x1 + 2, min(x + w, image_width))
+            y2 = max(y1 + 2, min(y + h, image_height))
+            
+            if (x2 - x1) < 2.0 or (y2 - y1) < 2.0:
+                continue
+            
+            if x1 >= image_width or y1 >= image_height or x2 <= 0 or y2 <= 0:
+                continue
+            
+            annotations.append([x1, y1, x2, y2, class_id])
+            
+        except (ValueError, KeyError) as e:
+            continue
+    
+    if len(annotations) == 0:
+        return torch.zeros((0, 5), dtype=torch.float32)
+    
+    return torch.tensor(annotations, dtype=torch.float32)
+
+
+def create_robust_event_representation(x, y, t, p, image_height, image_width, normalize_events=True):
+    channels = 2  
+    time_surface = np.zeros((channels, image_height, image_width), dtype=np.float32)
+    
+    if len(x) == 0:
+        return torch.from_numpy(time_surface).float()
+    
+    try:
+        valid_mask = (
+            (x >= 0) & (x < image_width) & 
+            (y >= 0) & (y < image_height) &
+            np.isfinite(x) & np.isfinite(y) & 
+            np.isfinite(t) & np.isfinite(p)
+        )
+        
+        if not valid_mask.any():
+            return torch.from_numpy(time_surface).float()
+        
+        x_valid = x[valid_mask].astype(np.int32)
+        y_valid = y[valid_mask].astype(np.int32)
+        t_valid = t[valid_mask]
+        p_valid = p[valid_mask]
+        
+        if len(t_valid) > 1:
+            t_min, t_max = t_valid.min(), t_valid.max()
+            if t_max > t_min:
+                t_normalized = (t_valid - t_min) / (t_max - t_min)
+            else:
+                t_normalized = np.ones_like(t_valid) * 0.5
+        else:
+            t_normalized = np.ones_like(t_valid) * 0.5
+        
+        t_normalized = np.clip(t_normalized, 0, 1)
+        
+        for i in range(len(x_valid)):
+            try:
+                polarity_idx = 1 if p_valid[i] > 0 else 0
+                if 0 <= y_valid[i] < image_height and 0 <= x_valid[i] < image_width:
+                    time_surface[polarity_idx, y_valid[i], x_valid[i]] = t_normalized[i]
+            except IndexError:
+                continue
+        
+        if normalize_events:
+            time_surface = np.clip(time_surface * 2.0 - 1.0, -1.0, 1.0)
+        
+        if not np.isfinite(time_surface).all():
+            time_surface = np.nan_to_num(time_surface, nan=0.0, posinf=1.0, neginf=-1.0)
+        
+        return torch.from_numpy(np.ascontiguousarray(time_surface)).float()
+        
+    except Exception as e:
+        return torch.from_numpy(time_surface).float()
 
 
 class DSECDetDataset(Dataset):
@@ -192,19 +286,19 @@ class DSECDetDataset(Dataset):
             
             with h5py.File(events_path, 'r') as f:
                 try:
-                    events_t = np.ascontiguousarray(f['events/t'][:])
-                    events_x = np.ascontiguousarray(f['events/x'][:])
-                    events_y = np.ascontiguousarray(f['events/y'][:])
-                    events_p = np.ascontiguousarray(f['events/p'][:])
+                    events_t = np.array(f['events/t'][:], copy=True)
+                    events_x = np.array(f['events/x'][:], copy=True)
+                    events_y = np.array(f['events/y'][:], copy=True)
+                    events_p = np.array(f['events/p'][:], copy=True)
                 except Exception as read_error:
                     print(f"Error reading events data: {read_error}")
                     if "required filter" in str(read_error):
                         print("This appears to be a compression issue. Trying alternative approach...")
                         try:
-                            events_t = np.ascontiguousarray(f['events/t'][:])
-                            events_x = np.ascontiguousarray(f['events/x'][:])
-                            events_y = np.ascontiguousarray(f['events/y'][:])
-                            events_p = np.ascontiguousarray(f['events/p'][:])
+                            events_t = np.array(f['events/t'])
+                            events_x = np.array(f['events/x'])
+                            events_y = np.array(f['events/y'])
+                            events_p = np.array(f['events/p'])
                         except:
                             raise read_error
                     else:
@@ -228,107 +322,15 @@ class DSECDetDataset(Dataset):
             print(f"Error loading events: {e}")
             return self._get_empty_events()
         
-        if self.event_representation == 'time_surface':
-            event_img = self._create_time_surface(x, y, t, p)
-        elif self.event_representation == 'event_count':
-            event_img = self._create_event_count_image(x, y, p)
-        elif self.event_representation == 'binary':
-            event_img = self._create_binary_image(x, y, p)
-        else:
-            event_img = self._create_time_surface(x, y, t, p)
-        
+        event_img = create_robust_event_representation(x, y, t, p, self.image_height, self.image_width, self.normalize_events)
         return event_img
     
-    def _create_time_surface(self, x, y, t, p):
-        time_surface = np.zeros((5, self.image_height, self.image_width), dtype=np.float32)
-        
-        if len(x) > 0:
-            t_normalized = (t - t.min()) / (t.max() - t.min() + 1e-6)
-            
-            valid_mask = (x >= 0) & (x < self.image_width) & (y >= 0) & (y < self.image_height)
-            x_valid = x[valid_mask]
-            y_valid = y[valid_mask]
-            t_valid = t_normalized[valid_mask]
-            p_valid = p[valid_mask]
-            
-            for i in range(len(x_valid)):
-                polarity_idx = 1 if p_valid[i] > 0 else 0
-                time_surface[polarity_idx, y_valid[i], x_valid[i]] = t_valid[i]
-        
-        if self.normalize_events:
-            time_surface = time_surface * 2.0 - 1.0
-        
-        return torch.from_numpy(np.ascontiguousarray(time_surface)).float()
-    
-    def _create_event_count_image(self, x, y, p):
-        event_count = np.zeros((5, self.image_height, self.image_width), dtype=np.float32)
-        
-        if len(x) > 0:
-            valid_mask = (x >= 0) & (x < self.image_width) & (y >= 0) & (y < self.image_height)
-            x_valid = x[valid_mask]
-            y_valid = y[valid_mask]
-            p_valid = p[valid_mask]
-            
-            for i in range(len(x_valid)):
-                polarity_idx = 1 if p_valid[i] > 0 else 0
-                event_count[polarity_idx, y_valid[i], x_valid[i]] += 1
-        
-        if self.normalize_events:
-            event_count = np.log(event_count + 1)
-            max_val = event_count.max()
-            if max_val > 0:
-                event_count = event_count / max_val
-        
-        return torch.from_numpy(event_count.copy()).float()
-    
-    def _create_binary_image(self, x, y, p):
-        binary_image = np.zeros((5, self.image_height, self.image_width), dtype=np.float32)
-        
-        if len(x) > 0:
-            valid_mask = (x >= 0) & (x < self.image_width) & (y >= 0) & (y < self.image_height)
-            x_valid = x[valid_mask]
-            y_valid = y[valid_mask]
-            p_valid = p[valid_mask]
-            
-            for i in range(len(x_valid)):
-                polarity_idx = 1 if p_valid[i] > 0 else 0
-                binary_image[polarity_idx, y_valid[i], x_valid[i]] = 1.0
-        
-        return torch.from_numpy(binary_image.copy()).float()
-    
     def _process_tracks(self, tracks):
-        if len(tracks) == 0:
-            return torch.zeros((0, 5), dtype=torch.float32)
-        
-        annotations = []
-        for track in tracks:
-            x = float(track['x'])
-            y = float(track['y'])
-            w = float(track['w'])
-            h = float(track['h'])
-            class_id = int(track['class_id'])
-            
-            if w < 1 or h < 1 or class_id >= len(self.classes):
-                continue
-            
-            x1 = max(0, x)
-            y1 = max(0, y)
-            x2 = min(self.image_width, x + w)
-            y2 = min(self.image_height, y + h)
-            
-            if x2 <= x1 or y2 <= y1:
-                continue
-            
-            annotations.append([x1, y1, x2, y2, class_id])
-        
-        if len(annotations) == 0:
-            return torch.zeros((0, 5), dtype=torch.float32)
-        
-        return torch.tensor(annotations, dtype=torch.float32)
+        return improved_process_tracks(tracks, self.image_width, self.image_height, self.classes)
     
     def _get_empty_sample(self):
         return {
-            'img': torch.zeros(5, self.image_height, self.image_width),
+            'img': torch.zeros(2, self.image_height, self.image_width),
             'img_rgb': np.zeros((self.image_height, self.image_width, 3), dtype=np.float32),
             'annot': torch.zeros(0, 5),
             'sequence': '',
@@ -337,7 +339,7 @@ class DSECDetDataset(Dataset):
         }
     
     def _get_empty_events(self):
-        return torch.zeros(5, self.image_height, self.image_width)
+        return torch.zeros(2, self.image_height, self.image_width)
     
     def name_to_label(self, name):
         return self.classes[name]
@@ -350,6 +352,7 @@ class DSECDetDataset(Dataset):
     
     def image_aspect_ratio(self, image_index):
         return float(self.image_width) / float(self.image_height)
+
 
 class Resizer(object):
     def __init__(self, dataset_name='dsec'):
@@ -397,8 +400,13 @@ class Resizer(object):
 
         if len(annots) > 0:
             annots[:, :4] *= scale
+            annots[:, 0] = np.clip(annots[:, 0], 0, image.shape[1] - 1)
+            annots[:, 1] = np.clip(annots[:, 1], 0, image.shape[0] - 1)
+            annots[:, 2] = np.clip(annots[:, 2], annots[:, 0] + 1, image.shape[1])
+            annots[:, 3] = np.clip(annots[:, 3], annots[:, 1] + 1, image.shape[0])
 
-        return {'img': sample['img'], 'img_rgb': torch.from_numpy(np.ascontiguousarray(image.astype(np.float32))), 'annot': torch.from_numpy(np.ascontiguousarray(annots)), 'scale': scale}
+        return {'img': sample['img'], 'img_rgb': torch.from_numpy(image.astype(np.float32)), 'annot': torch.from_numpy(annots), 'scale': scale}
+
 
 class Normalizer(object):
     def __init__(self, dataset_name='dsec'):
@@ -416,7 +424,11 @@ class Normalizer(object):
         if isinstance(image, torch.Tensor):
             image = image.numpy()
 
-        return {'img': sample['img'],'img_rgb': torch.from_numpy(np.ascontiguousarray((image.astype(np.float32)-self.mean)/self.std)), 'annot': annots}
+        normalized_image = (image.astype(np.float32) - self.mean) / self.std
+        normalized_image = np.clip(normalized_image, -10.0, 10.0)
+
+        return {'img': sample['img'],'img_rgb': torch.from_numpy(normalized_image), 'annot': annots}
+
 
 class Augmenter(object):
     def __call__(self, sample, flip_x=0.5):
@@ -441,14 +453,13 @@ class Augmenter(object):
                 x1 = annots[:, 0].copy()
                 x2 = annots[:, 2].copy()
                 
-                x_tmp = x1.copy()
-
                 annots[:, 0] = cols - x2
-                annots[:, 2] = cols - x_tmp
+                annots[:, 2] = cols - x1
 
-            sample = {'img': torch.from_numpy(np.ascontiguousarray(image_event)), 'img_rgb': torch.from_numpy(np.ascontiguousarray(image_rgb)), 'annot': torch.from_numpy(np.ascontiguousarray(annots))}
+            sample = {'img': torch.from_numpy(image_event), 'img_rgb': torch.from_numpy(image_rgb), 'annot': torch.from_numpy(annots)}
 
         return sample
+
 
 def collater(data):
     imgs = [s['img'] for s in data]
@@ -462,7 +473,8 @@ def collater(data):
         if len(imgs[0].shape) == 3:
             max_height = max([img.shape[1] for img in imgs])
             max_width = max([img.shape[2] for img in imgs])
-            padded_imgs = torch.zeros(batch_size, 5, max_height, max_width)
+            channels = imgs[0].shape[0]
+            padded_imgs = torch.zeros(batch_size, channels, max_height, max_width)
             
             for i in range(batch_size):
                 img = imgs[i]
@@ -539,6 +551,7 @@ def collater(data):
 
     return {'img': padded_imgs, 'img_rgb': padded_imgs_rgb, 'annot': annot_padded, 'scale': scales}
 
+
 class AspectRatioBasedSampler(Sampler):
     def __init__(self, data_source, batch_size, drop_last):
         self.data_source = data_source
@@ -563,9 +576,6 @@ class AspectRatioBasedSampler(Sampler):
         
         return [[order[x % len(order)] for x in range(i, i + self.batch_size)] for i in range(0, len(order), self.batch_size)]
 
-def load_split_config(config_path):
-    with open(config_path, 'r') as f:
-        return yaml.safe_load(f)
 
 def create_dsec_det_dataloader(root_dir, split='train', batch_size=8, num_workers=4,
                               shuffle=None, event_representation='time_surface', dt=50,
@@ -578,7 +588,8 @@ def create_dsec_det_dataloader(root_dir, split='train', batch_size=8, num_worker
     
     split_config = None
     if split_config_path and os.path.exists(split_config_path):
-        split_config = load_split_config(split_config_path)
+        with open(split_config_path, 'r') as f:
+            split_config = yaml.safe_load(f)
     
     transform_list = []
     
