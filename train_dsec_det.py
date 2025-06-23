@@ -190,7 +190,7 @@ def train_epoch(dataloader, retinanet, optimizer, epoch_num, start_time, loss_th
             loss_hist.append(total_loss)
             
             # 定期输出
-            if iter_num % 20 == 0:
+            if iter_num % 10 == 0:
                 avg_loss = np.mean(loss_hist) if loss_hist else 0
                 valid_rate = 100 * valid_iterations / total_iterations
                 print(f'[{time_since(start_time)}] Epoch {epoch_num} | Iter {iter_num} | '

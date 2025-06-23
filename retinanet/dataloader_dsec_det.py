@@ -427,6 +427,9 @@ class Normalizer(object):
         normalized_image = (image.astype(np.float32) - self.mean) / self.std
         normalized_image = np.clip(normalized_image, -10.0, 10.0)
 
+        if len(normalized_image.shape) == 3 and normalized_image.shape[-1] == 3:
+            normalized_image = normalized_image.transpose(2, 0, 1)  # [H,W,C] -> [C,H,W]
+
         return {'img': sample['img'],'img_rgb': torch.from_numpy(normalized_image), 'annot': annots}
 
 
