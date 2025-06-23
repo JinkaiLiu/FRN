@@ -5,7 +5,7 @@ DSEC Detection Training
 ============================================================
 Root directory: /media/data/hucao/zhenwu/hucao/DSEC/DSEC_Det
 Batch size: 1
-Learning rate: 1e-05
+Learning rate: 5e-05
 Loss threshold: 50.0
 Epochs: 5
 Fusion model: fpn_fusion
