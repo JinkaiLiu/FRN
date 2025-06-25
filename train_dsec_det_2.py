@@ -5,12 +5,9 @@ import time
 import math
 import torch
 import torch.optim as optim
-from torch.cuda.amp import autocast, GradScaler
-import os
 
 from retinanet.dataloader_dsec_det import create_dsec_det_dataloader
 from retinanet import model
-from retinanet.csv_eval_dsec_det import evaluate, evaluate_coco_map
 
 assert torch.__version__.split('.')[0] == '1'
 print('CUDA available: {}'.format(torch.cuda.is_available()))
@@ -26,7 +23,7 @@ def time_since(since):
 
 def debug_batch_data(data_batch, batch_idx):
     """
-    Debug batch data format and content
+    最终修复版debug函数 - 彻底避免维度问题
     """
     print(f"\n=== Debug Batch {batch_idx} ===")
     
@@ -111,18 +108,17 @@ def debug_batch_data(data_batch, batch_idx):
         return True
 
 
-def safe_training_step(retinanet, data, optimizer, iter_num, loss_threshold=50.0, 
-                      scaler=None, use_amp=False):
+def safe_training_step(retinanet, data, optimizer, iter_num, loss_threshold=50.0):
     """
-    Training step with error handling
+    安全的训练步骤，包含数据验证和loss过滤
     """
     try:
-        # non_blocking GPU transfer
-        img_rgb = data['img_rgb'].cuda(non_blocking=True).float()
-        img_event = data['img'].cuda(non_blocking=True).float()
-        annot = data['annot'].cuda(non_blocking=True).float()
+        # 数据移到GPU
+        img_rgb = data['img_rgb'].cuda().float()
+        img_event = data['img'].cuda().float()
+        annot = data['annot'].cuda().float()
         
-        # data validation
+        # 快速数据检查
         if torch.isnan(img_event).any() or torch.isinf(img_event).any():
             print(f"Iter {iter_num}: NaN/Inf in event data")
             return None, None, None
@@ -130,47 +126,37 @@ def safe_training_step(retinanet, data, optimizer, iter_num, loss_threshold=50.0
             print(f"Iter {iter_num}: NaN/Inf in RGB data")
             return None, None, None
         
-        # check for empty data
+        # 检查全0数据
         if img_event.max() == 0 or img_rgb.max() == 0:
             print(f"Iter {iter_num}: Zero data detected")
             return None, None, None
         
-        optimizer.zero_grad()
+        # 前向传播
+        classification_loss, regression_loss = retinanet([img_rgb, img_event, annot])
+        classification_loss = classification_loss.mean()
+        regression_loss = regression_loss.mean()
+        total_loss = classification_loss + regression_loss
         
-        # mixed precision forward pass
-        if use_amp and scaler is not None:
-            with autocast():
-                classification_loss, regression_loss = retinanet([img_rgb, img_event, annot])
-                classification_loss = classification_loss.mean()
-                regression_loss = regression_loss.mean()
-                total_loss = classification_loss + regression_loss
-        else:
-            # standard forward pass
-            classification_loss, regression_loss = retinanet([img_rgb, img_event, annot])
-            classification_loss = classification_loss.mean()
-            regression_loss = regression_loss.mean()
-            total_loss = classification_loss + regression_loss
-        
-        # loss validation
+        # Loss检查
         if torch.isnan(total_loss) or torch.isinf(total_loss):
             print(f"Iter {iter_num}: NaN/Inf loss")
             return None, None, None
             
         if total_loss.item() > loss_threshold:
             print(f"Iter {iter_num}: Loss {total_loss.item():.1f} > threshold {loss_threshold}")
+            #return None, None, None
         
-        # mixed precision backward pass
-        if use_amp and scaler is not None:
-            scaler.scale(total_loss).backward()
-            scaler.unscale_(optimizer)
-            grad_norm = torch.nn.utils.clip_grad_norm_(retinanet.parameters(), 1.0)
-            scaler.step(optimizer)
-            scaler.update()
-        else:
-            # standard backward pass
-            total_loss.backward()
-            grad_norm = torch.nn.utils.clip_grad_norm_(retinanet.parameters(), 1.0)
-            optimizer.step()
+        # 反向传播
+        optimizer.zero_grad()
+        total_loss.backward()
+        
+        # 梯度裁剪
+        grad_norm = torch.nn.utils.clip_grad_norm_(retinanet.parameters(), 1.0)
+        #if grad_norm > 10.0:
+            #print(f"Iter {iter_num}: Large gradient norm {grad_norm:.3f}")
+            #return None, None, None
+        
+        optimizer.step()
         
         return classification_loss.item(), regression_loss.item(), total_loss.item()
         
@@ -179,10 +165,9 @@ def safe_training_step(retinanet, data, optimizer, iter_num, loss_threshold=50.0
         return None, None, None
 
 
-def train_epoch(dataloader, retinanet, optimizer, epoch_num, start_time, loss_threshold=50.0,
-               scaler=None, use_amp=False):
+def train_epoch(dataloader, retinanet, optimizer, epoch_num, start_time, loss_threshold=50.0):
     """
-    Train for one epoch
+    训练一个epoch
     """
     retinanet.train()
     if hasattr(retinanet.module, 'freeze_bn'):
@@ -197,14 +182,14 @@ def train_epoch(dataloader, retinanet, optimizer, epoch_num, start_time, loss_th
         total_iterations += 1
         
         cls_loss, reg_loss, total_loss = safe_training_step(
-            retinanet, data, optimizer, iter_num, loss_threshold, scaler, use_amp
+            retinanet, data, optimizer, iter_num, loss_threshold
         )
         
         if total_loss is not None:
             valid_iterations += 1
             loss_hist.append(total_loss)
             
-            # periodic logging
+            # 定期输出
             if iter_num % 10 == 0:
                 avg_loss = np.mean(loss_hist) if loss_hist else 0
                 valid_rate = 100 * valid_iterations / total_iterations
@@ -213,11 +198,11 @@ def train_epoch(dataloader, retinanet, optimizer, epoch_num, start_time, loss_th
                       f'Avg: {avg_loss:.4f} | Valid: {valid_iterations}/{total_iterations} ({valid_rate:.1f}%)')
                 epoch_losses.append(avg_loss)
         
-        # memory cleanup
+        # 内存清理
         if iter_num > 0 and iter_num % 100 == 0:
             torch.cuda.empty_cache()
     
-    # epoch summary
+    # Epoch总结
     if epoch_losses:
         avg_epoch_loss = np.mean(epoch_losses)
         valid_rate = 100 * valid_iterations / total_iterations
@@ -228,42 +213,14 @@ def train_epoch(dataloader, retinanet, optimizer, epoch_num, start_time, loss_th
         return float('inf')
 
 
-def evaluate_epoch(retinanet, dataset_val, epoch_num, save_folder):
-    """
-    Evaluate model performance using mAP
-    """
-    print(f"\n{'='*20} Validation Epoch {epoch_num} {'='*20}")
-    
-    eval_save_folder = os.path.join(save_folder, f'eval_epoch_{epoch_num}')
-    os.makedirs(eval_save_folder, exist_ok=True)
-    
-    # use evaluation function
-    mean_ap = evaluate(
-        generator=dataset_val,
-        retinanet=retinanet,
-        iou_threshold=0.5,
-        score_threshold=0.05,
-        max_detections=100,
-        save_detection=True,
-        save_folder=eval_save_folder,
-        load_detection=False,
-        save_path=eval_save_folder
-    )
-    
-    print(f"\nEpoch {epoch_num} validation results:")
-    print(f"mAP@0.5: {mean_ap:.4f}")
-    
-    return mean_ap
-
-
 def main():
-    parser = argparse.ArgumentParser(description='DSEC Detection Training Script with mAP Evaluation')
+    parser = argparse.ArgumentParser(description='DSEC Detection Training Script')
     
     # 数据参数
     parser.add_argument('--root_dir', default='/media/data/hucao/zhenwu/hucao/DSEC/DSEC_Det', 
                        help='DSEC dataset root directory')
-    parser.add_argument('--batch_size', type=int, default=2, help='Batch size')
-    parser.add_argument('--num_workers', type=int, default=8, help='Data loading workers')
+    parser.add_argument('--batch_size', type=int, default=1, help='Batch size')
+    parser.add_argument('--num_workers', type=int, default=6, help='Data loading workers')
     
     # 训练参数  
     parser.add_argument('--epochs', type=int, default=60, help='Number of epochs')
@@ -276,13 +233,6 @@ def main():
     parser.add_argument('--depth', type=int, default=50, choices=[18, 34, 50], 
                        help='ResNet depth')
     
-    # 评估参数
-    parser.add_argument('--eval_interval', type=int, default=5, help='Evaluation interval (epochs)')
-    parser.add_argument('--eval_coco', action='store_true', help='Also evaluate COCO-style mAP')
-    
-    # 优化参数
-    parser.add_argument('--use_amp', action='store_true', help='Use automatic mixed precision')
-    
     # 其他参数
     parser.add_argument('--debug_data', action='store_true', help='Enable data debugging')
     parser.add_argument('--continue_training', action='store_true', help='Continue from checkpoint')
@@ -292,25 +242,18 @@ def main():
     
     args = parser.parse_args()
     
-    # create save directory
-    os.makedirs(args.save_dir, exist_ok=True)
-    
     print("="*60)
-    print("DSEC Detection Training with mAP Evaluation")
+    print("DSEC Detection Training")
     print("="*60)
     print(f"Root directory: {args.root_dir}")
     print(f"Batch size: {args.batch_size}")
-    print(f"Num workers: {args.num_workers}")
     print(f"Learning rate: {args.learning_rate}")
     print(f"Loss threshold: {args.loss_threshold}")
     print(f"Epochs: {args.epochs}")
     print(f"Fusion model: {args.fusion}")
-    print(f"Mixed precision: {args.use_amp}")
-    print(f"Evaluation interval: {args.eval_interval}")
-    print(f"COCO evaluation: {args.eval_coco}")
     
-    # load training data
-    print("\nLoading training dataset...")
+    # 加载数据
+    print("\nLoading dataset...")
     dataloader_train, dataset_train = create_dsec_det_dataloader(
         root_dir=args.root_dir,
         split='train',
@@ -327,27 +270,7 @@ def main():
         use_downsampled_events=True
     )
     
-    print(f"Training dataset loaded: {len(dataset_train)} samples")
-    
-    # load validation data (single samples for evaluation function)
-    print("Loading validation dataset...")
-    _, dataset_val = create_dsec_det_dataloader(
-        root_dir=args.root_dir,
-        split='val',  
-        batch_size=1,  # validation uses batch_size=1
-        num_workers=1,
-        shuffle=False,
-        event_representation='time_surface',
-        dt=50,
-        image_height=480,
-        image_width=640,
-        augment=False,  # no data augmentation for validation
-        normalize_events=True,
-        normalize_images=True,
-        use_downsampled_events=True
-    )
-    
-    print(f"Validation dataset loaded: {len(dataset_val)} samples")
+    print(f"Dataset loaded: {len(dataset_train)} training samples")
     
     # Debug模式
     if args.debug_data:
@@ -365,7 +288,7 @@ def main():
         print("\nDebug completed. Use without --debug_data to start training.")
         return
     
-    # create model
+    # 创建模型
     print("\nCreating model...")
     retinanet = model.resnet50(
         dataset_name='dsec',
@@ -376,8 +299,7 @@ def main():
     print(f"Model created: ResNet{args.depth} with {args.fusion} fusion")
     print(f"Number of classes: {dataset_train.num_classes()}")
     
-    # GPU setup
-    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    # GPU设置
     if torch.cuda.is_available():
         retinanet = retinanet.cuda()
         retinanet = torch.nn.DataParallel(retinanet).cuda()
@@ -386,21 +308,11 @@ def main():
         retinanet = torch.nn.DataParallel(retinanet)
         print("Using CPU")
     
-    # optimizer and scheduler
+    # 优化器和调度器
     optimizer = optim.Adam(retinanet.parameters(), lr=args.learning_rate)
     scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, patience=3, verbose=True, factor=0.5)
     
-    # mixed precision scaler
-    scaler = GradScaler() if args.use_amp else None
-    
-    # track best performance
-    best_map = 0.0
-    best_epoch = 0
-    
-    # training log
-    train_log = []
-    
-    # load checkpoint
+    # 加载checkpoint
     start_epoch = 0
     if args.continue_training and args.checkpoint:
         print(f"\nLoading checkpoint: {args.checkpoint}")
@@ -408,17 +320,13 @@ def main():
             checkpoint = torch.load(args.checkpoint)
             retinanet.module.load_state_dict(checkpoint['model_state_dict'])
             optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
-            if scaler and 'scaler_state_dict' in checkpoint:
-                scaler.load_state_dict(checkpoint['scaler_state_dict'])
             start_epoch = checkpoint.get('epoch', 0)
-            best_map = checkpoint.get('best_map', 0.0)
-            best_epoch = checkpoint.get('best_epoch', 0)
-            print(f"Resumed from epoch {start_epoch}, best mAP: {best_map:.4f} (epoch {best_epoch})")
+            print(f"Resumed from epoch {start_epoch}")
         except Exception as e:
             print(f"Failed to load checkpoint: {e}")
             start_epoch = 0
     
-    # start training
+    # 开始训练
     print(f"\n" + "="*60)
     print("STARTING TRAINING")
     print("="*60)
@@ -428,94 +336,23 @@ def main():
     for epoch in range(start_epoch, args.epochs):
         print(f"\n--- Epoch {epoch+1}/{args.epochs} ---")
         
-        # training
         avg_epoch_loss = train_epoch(
             dataloader_train, retinanet, optimizer, epoch, 
-            start_time, args.loss_threshold, scaler, args.use_amp
+            start_time, args.loss_threshold
         )
         
-        # validation
-        current_map = 0.0
-        if (epoch + 1) % args.eval_interval == 0 or epoch == args.epochs - 1:
-            current_map = evaluate_epoch(retinanet, dataset_val, epoch, args.save_dir)
-            
-            # optional COCO evaluation
-            if args.eval_coco:
-                print("Computing COCO-style mAP...")
-                coco_save_folder = os.path.join(args.save_dir, f'coco_eval_epoch_{epoch}')
-                os.makedirs(coco_save_folder, exist_ok=True)
-                
-                coco_aps = evaluate_coco_map(
-                    generator=dataset_val,
-                    retinanet=retinanet,
-                    iou_threshold=0.5,
-                    score_threshold=0.05,
-                    max_detections=100,
-                    save_detection=True,
-                    save_folder=coco_save_folder,
-                    load_detection=False,
-                    save_path=coco_save_folder
-                )
-                
-                # compute COCO-style average mAP
-                coco_map = np.mean([np.mean(aps) for aps in coco_aps.values()])
-                print(f"COCO-style mAP: {coco_map:.4f}")
-            
-            # update best results
-            if current_map > best_map:
-                best_map = current_map
-                best_epoch = epoch
-                print(f"🎉 New best mAP: {best_map:.4f} (Epoch {best_epoch})")
-                
-                # save best model
-                best_model_path = f'{args.save_dir}/best_model.pt'
-                save_dict = {
-                    'epoch': epoch,
-                    'model_state_dict': retinanet.module.state_dict(),
-                    'optimizer_state_dict': optimizer.state_dict(),
-                    'loss': avg_epoch_loss,
-                    'map': current_map,
-                    'best_map': best_map,
-                    'best_epoch': best_epoch,
-                    'config': {
-                        'fusion': args.fusion,
-                        'depth': args.depth,
-                        'learning_rate': args.learning_rate,
-                        'batch_size': args.batch_size,
-                        'loss_threshold': args.loss_threshold
-                    }
-                }
-                if scaler:
-                    save_dict['scaler_state_dict'] = scaler.state_dict()
-                
-                torch.save(save_dict, best_model_path)
-                print(f"Best model saved: {best_model_path}")
-        
-        # log training progress
-        train_log.append({
-            'epoch': epoch,
-            'loss': avg_epoch_loss,
-            'map': current_map,
-            'best_map': best_map,
-            'best_epoch': best_epoch
-        })
-        
-        # adjust learning rate
+        # 调整学习率
         if avg_epoch_loss != float('inf'):
             scheduler.step(avg_epoch_loss)
         
-        # save model periodically
+        # 保存模型
         if epoch % 5 == 0 or epoch == args.epochs - 1:
             save_path = f'{args.save_dir}/dsec_retinanet_epoch_{epoch}.pt'
-            save_dict = {
+            torch.save({
                 'epoch': epoch,
                 'model_state_dict': retinanet.module.state_dict(),
                 'optimizer_state_dict': optimizer.state_dict(),
                 'loss': avg_epoch_loss,
-                'map': current_map,
-                'best_map': best_map,
-                'best_epoch': best_epoch,
-                'train_log': train_log,
                 'config': {
                     'fusion': args.fusion,
                     'depth': args.depth,
@@ -523,22 +360,15 @@ def main():
                     'batch_size': args.batch_size,
                     'loss_threshold': args.loss_threshold
                 }
-            }
-            if scaler:
-                save_dict['scaler_state_dict'] = scaler.state_dict()
-            
-            torch.save(save_dict, save_path)
+            }, save_path)
             print(f"Model saved: {save_path}")
     
-    # final save
+    # 最终保存
     final_path = f'{args.save_dir}/dsec_retinanet_final.pt'
-    final_dict = {
+    torch.save({
         'epoch': args.epochs,
         'model_state_dict': retinanet.module.state_dict(),
         'optimizer_state_dict': optimizer.state_dict(),
-        'train_log': train_log,
-        'best_map': best_map,
-        'best_epoch': best_epoch,
         'config': {
             'fusion': args.fusion,
             'depth': args.depth,
@@ -546,17 +376,12 @@ def main():
             'batch_size': args.batch_size,
             'loss_threshold': args.loss_threshold
         }
-    }
-    if scaler:
-        final_dict['scaler_state_dict'] = scaler.state_dict()
-    
-    torch.save(final_dict, final_path)
+    }, final_path)
     
     total_time = time_since(start_time)
     print(f"\n" + "="*60)
     print(f"TRAINING COMPLETED IN {total_time}")
     print(f"Final model saved: {final_path}")
-    print(f"Best mAP: {best_map:.4f} (Epoch {best_epoch})")
     print("="*60)
 
 
