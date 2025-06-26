@@ -1,0 +1,411 @@
+nohup: ignoring input
+CUDA available: True
+============================================================
+DSEC Detection Training with mAP Evaluation
+============================================================
+Root directory: /media/data/hucao/zhenwu/hucao/DSEC/DSEC_Det
+Batch size: 2
+Num workers: 4
+Learning rate: 5e-05
+Loss threshold: 50.0
+Epochs: 5
+Fusion model: fpn_fusion
+Mixed precision: True
+Evaluation interval: 5
+COCO evaluation: False
+
+Loading training dataset...
+ Processing sequence: interlaken_00_g
+Loaded 1335 timestamps
+Loaded 7039 tracks
+✅ Created 1335 samples for interlaken_00_g
+ Processing sequence: zurich_city_16_a
+Loaded 1505 timestamps
+Loaded 3714 tracks
+✅ Created 1505 samples for zurich_city_16_a
+ Processing sequence: zurich_city_09_e
+Loaded 817 timestamps
+Loaded 4144 tracks
+✅ Created 817 samples for zurich_city_09_e
+ Processing sequence: zurich_city_02_c
+Loaded 2883 timestamps
+Loaded 10408 tracks
+✅ Created 2883 samples for zurich_city_02_c
+ Processing sequence: zurich_city_02_a
+Loaded 235 timestamps
+Loaded 840 tracks
+✅ Created 235 samples for zurich_city_02_a
+ Processing sequence: zurich_city_02_d
+Loaded 1843 timestamps
+Loaded 2463 tracks
+✅ Created 1843 samples for zurich_city_02_d
+ Processing sequence: zurich_city_20_a
+Loaded 1687 timestamps
+Loaded 10586 tracks
+✅ Created 1687 samples for zurich_city_20_a
+ Processing sequence: zurich_city_05_a
+Loaded 1753 timestamps
+Loaded 5873 tracks
+✅ Created 1753 samples for zurich_city_05_a
+ Processing sequence: interlaken_00_e
+Loaded 1991 timestamps
+Loaded 6684 tracks
+✅ Created 1991 samples for interlaken_00_e
+ Processing sequence: zurich_city_08_a
+Loaded 787 timestamps
+Loaded 5545 tracks
+✅ Created 787 samples for zurich_city_08_a
+ Processing sequence: zurich_city_18_a
+Loaded 1551 timestamps
+Loaded 6177 tracks
+✅ Created 1551 samples for zurich_city_18_a
+ Processing sequence: zurich_city_04_d
+Loaded 957 timestamps
+Loaded 5759 tracks
+✅ Created 957 samples for zurich_city_04_d
+ Processing sequence: zurich_city_05_b
+Loaded 1629 timestamps
+Loaded 7199 tracks
+✅ Created 1629 samples for zurich_city_05_b
+ Processing sequence: zurich_city_11_b
+Loaded 1933 timestamps
+Loaded 8250 tracks
+✅ Created 1933 samples for zurich_city_11_b
+ Processing sequence: zurich_city_01_e
+Loaded 1991 timestamps
+Loaded 15403 tracks
+✅ Created 1991 samples for zurich_city_01_e
+ Processing sequence: zurich_city_01_d
+Loaded 795 timestamps
+Loaded 8800 tracks
+✅ Created 795 samples for zurich_city_01_d
+ Processing sequence: zurich_city_09_b
+Loaded 367 timestamps
+Loaded 3192 tracks
+✅ Created 367 samples for zurich_city_09_b
+ Processing sequence: zurich_city_00_b
+Loaded 1463 timestamps
+Loaded 15365 tracks
+✅ Created 1463 samples for zurich_city_00_b
+ Processing sequence: zurich_city_04_e
+Loaded 269 timestamps
+Loaded 2245 tracks
+✅ Created 269 samples for zurich_city_04_e
+ Processing sequence: zurich_city_04_b
+Loaded 269 timestamps
+Loaded 2255 tracks
+✅ Created 269 samples for zurich_city_04_b
+ Processing sequence: zurich_city_07_a
+Loaded 1463 timestamps
+Loaded 6882 tracks
+✅ Created 1463 samples for zurich_city_07_a
+ Processing sequence: zurich_city_09_c
+Loaded 1323 timestamps
+Loaded 6410 tracks
+✅ Created 1323 samples for zurich_city_09_c
+ Processing sequence: zurich_city_17_a
+Loaded 1533 timestamps
+Loaded 720 tracks
+✅ Created 1533 samples for zurich_city_17_a
+ Processing sequence: zurich_city_01_f
+Loaded 1573 timestamps
+Loaded 10154 tracks
+✅ Created 1573 samples for zurich_city_01_f
+ Processing sequence: zurich_city_04_f
+Loaded 859 timestamps
+Loaded 6107 tracks
+✅ Created 859 samples for zurich_city_04_f
+ Processing sequence: interlaken_00_c
+Loaded 537 timestamps
+Loaded 934 tracks
+✅ Created 537 samples for interlaken_00_c
+ Processing sequence: zurich_city_04_c
+Loaded 1181 timestamps
+Loaded 8478 tracks
+✅ Created 1181 samples for zurich_city_04_c
+ Processing sequence: zurich_city_21_a
+Loaded 2599 timestamps
+Loaded 5282 tracks
+✅ Created 2599 samples for zurich_city_21_a
+ Processing sequence: zurich_city_11_a
+Loaded 465 timestamps
+Loaded 3028 tracks
+✅ Created 465 samples for zurich_city_11_a
+ Processing sequence: interlaken_00_f
+Loaded 1491 timestamps
+Loaded 6061 tracks
+✅ Created 1491 samples for interlaken_00_f
+ Processing sequence: zurich_city_03_a
+Loaded 883 timestamps
+Loaded 246 tracks
+✅ Created 883 samples for zurich_city_03_a
+ Processing sequence: zurich_city_01_c
+Loaded 977 timestamps
+Loaded 8665 tracks
+✅ Created 977 samples for zurich_city_01_c
+ Processing sequence: zurich_city_11_c
+Loaded 1957 timestamps
+Loaded 12871 tracks
+✅ Created 1957 samples for zurich_city_11_c
+ Processing sequence: zurich_city_01_b
+Loaded 1325 timestamps
+Loaded 10134 tracks
+✅ Created 1325 samples for zurich_city_01_b
+ Processing sequence: zurich_city_02_b
+Loaded 1225 timestamps
+Loaded 8399 tracks
+✅ Created 1225 samples for zurich_city_02_b
+ Processing sequence: zurich_city_02_e
+Loaded 1845 timestamps
+Loaded 6419 tracks
+✅ Created 1845 samples for zurich_city_02_e
+ Processing sequence: zurich_city_09_a
+Loaded 1813 timestamps
+Loaded 7899 tracks
+✅ Created 1813 samples for zurich_city_09_a
+ Processing sequence: zurich_city_19_a
+Loaded 1637 timestamps
+Loaded 4885 tracks
+✅ Created 1637 samples for zurich_city_19_a
+ Processing sequence: zurich_city_01_a
+Loaded 681 timestamps
+Loaded 3844 tracks
+✅ Created 681 samples for zurich_city_01_a
+ Processing sequence: zurich_city_00_a
+Loaded 939 timestamps
+Loaded 7446 tracks
+✅ Created 939 samples for zurich_city_00_a
+ Processing sequence: interlaken_00_d
+Loaded 1991 timestamps
+Loaded 3607 tracks
+✅ Created 1991 samples for interlaken_00_d
+ Processing sequence: zurich_city_10_b
+Loaded 2405 timestamps
+Loaded 10611 tracks
+✅ Created 2405 samples for zurich_city_10_b
+ Processing sequence: zurich_city_10_a
+Loaded 2315 timestamps
+Loaded 5606 tracks
+✅ Created 2315 samples for zurich_city_10_a
+ Processing sequence: thun_00_a
+Loaded 239 timestamps
+Loaded 912 tracks
+✅ Created 239 samples for thun_00_a
+ Processing sequence: zurich_city_04_a
+Loaded 701 timestamps
+Loaded 7037 tracks
+✅ Created 701 samples for zurich_city_04_a
+ Processing sequence: zurich_city_09_d
+Loaded 1699 timestamps
+Loaded 11250 tracks
+✅ Created 1699 samples for zurich_city_09_d
+ Processing sequence: zurich_city_06_a
+Loaded 1523 timestamps
+Loaded 4797 tracks
+✅ Created 1523 samples for zurich_city_06_a
+Total samples loaded: 63239
+DSEC-Det Dataset: Loaded 63239 samples for train split
+Training dataset loaded: 63239 samples
+Loading validation dataset...
+ Processing sequence: interlaken_00_g
+Loaded 1335 timestamps
+Loaded 7039 tracks
+✅ Created 1335 samples for interlaken_00_g
+ Processing sequence: zurich_city_16_a
+Loaded 1505 timestamps
+Loaded 3714 tracks
+✅ Created 1505 samples for zurich_city_16_a
+ Processing sequence: zurich_city_09_e
+Loaded 817 timestamps
+Loaded 4144 tracks
+✅ Created 817 samples for zurich_city_09_e
+ Processing sequence: zurich_city_02_c
+Loaded 2883 timestamps
+Loaded 10408 tracks
+✅ Created 2883 samples for zurich_city_02_c
+ Processing sequence: zurich_city_02_a
+Loaded 235 timestamps
+Loaded 840 tracks
+✅ Created 235 samples for zurich_city_02_a
+ Processing sequence: zurich_city_02_d
+Loaded 1843 timestamps
+Loaded 2463 tracks
+✅ Created 1843 samples for zurich_city_02_d
+ Processing sequence: zurich_city_20_a
+Loaded 1687 timestamps
+Loaded 10586 tracks
+✅ Created 1687 samples for zurich_city_20_a
+ Processing sequence: zurich_city_05_a
+Loaded 1753 timestamps
+Loaded 5873 tracks
+✅ Created 1753 samples for zurich_city_05_a
+ Processing sequence: interlaken_00_e
+Loaded 1991 timestamps
+Loaded 6684 tracks
+✅ Created 1991 samples for interlaken_00_e
+ Processing sequence: zurich_city_08_a
+Loaded 787 timestamps
+Loaded 5545 tracks
+✅ Created 787 samples for zurich_city_08_a
+ Processing sequence: zurich_city_18_a
+Loaded 1551 timestamps
+Loaded 6177 tracks
+✅ Created 1551 samples for zurich_city_18_a
+ Processing sequence: zurich_city_04_d
+Loaded 957 timestamps
+Loaded 5759 tracks
+✅ Created 957 samples for zurich_city_04_d
+ Processing sequence: zurich_city_05_b
+Loaded 1629 timestamps
+Loaded 7199 tracks
+✅ Created 1629 samples for zurich_city_05_b
+ Processing sequence: zurich_city_11_b
+Loaded 1933 timestamps
+Loaded 8250 tracks
+✅ Created 1933 samples for zurich_city_11_b
+ Processing sequence: zurich_city_01_e
+Loaded 1991 timestamps
+Loaded 15403 tracks
+✅ Created 1991 samples for zurich_city_01_e
+ Processing sequence: zurich_city_01_d
+Loaded 795 timestamps
+Loaded 8800 tracks
+✅ Created 795 samples for zurich_city_01_d
+ Processing sequence: zurich_city_09_b
+Loaded 367 timestamps
+Loaded 3192 tracks
+✅ Created 367 samples for zurich_city_09_b
+ Processing sequence: zurich_city_00_b
+Loaded 1463 timestamps
+Loaded 15365 tracks
+✅ Created 1463 samples for zurich_city_00_b
+ Processing sequence: zurich_city_04_e
+Loaded 269 timestamps
+Loaded 2245 tracks
+✅ Created 269 samples for zurich_city_04_e
+ Processing sequence: zurich_city_04_b
+Loaded 269 timestamps
+Loaded 2255 tracks
+✅ Created 269 samples for zurich_city_04_b
+ Processing sequence: zurich_city_07_a
+Loaded 1463 timestamps
+Loaded 6882 tracks
+✅ Created 1463 samples for zurich_city_07_a
+ Processing sequence: zurich_city_09_c
+Loaded 1323 timestamps
+Loaded 6410 tracks
+✅ Created 1323 samples for zurich_city_09_c
+ Processing sequence: zurich_city_17_a
+Loaded 1533 timestamps
+Loaded 720 tracks
+✅ Created 1533 samples for zurich_city_17_a
+ Processing sequence: zurich_city_01_f
+Loaded 1573 timestamps
+Loaded 10154 tracks
+✅ Created 1573 samples for zurich_city_01_f
+ Processing sequence: zurich_city_04_f
+Loaded 859 timestamps
+Loaded 6107 tracks
+✅ Created 859 samples for zurich_city_04_f
+ Processing sequence: interlaken_00_c
+Loaded 537 timestamps
+Loaded 934 tracks
+✅ Created 537 samples for interlaken_00_c
+ Processing sequence: zurich_city_04_c
+Loaded 1181 timestamps
+Loaded 8478 tracks
+✅ Created 1181 samples for zurich_city_04_c
+ Processing sequence: zurich_city_21_a
+Loaded 2599 timestamps
+Loaded 5282 tracks
+✅ Created 2599 samples for zurich_city_21_a
+ Processing sequence: zurich_city_11_a
+Loaded 465 timestamps
+Loaded 3028 tracks
+✅ Created 465 samples for zurich_city_11_a
+ Processing sequence: interlaken_00_f
+Loaded 1491 timestamps
+Loaded 6061 tracks
+✅ Created 1491 samples for interlaken_00_f
+ Processing sequence: zurich_city_03_a
+Loaded 883 timestamps
+Loaded 246 tracks
+✅ Created 883 samples for zurich_city_03_a
+ Processing sequence: zurich_city_01_c
+Loaded 977 timestamps
+Loaded 8665 tracks
+✅ Created 977 samples for zurich_city_01_c
+ Processing sequence: zurich_city_11_c
+Loaded 1957 timestamps
+Loaded 12871 tracks
+✅ Created 1957 samples for zurich_city_11_c
+ Processing sequence: zurich_city_01_b
+Loaded 1325 timestamps
+Loaded 10134 tracks
+✅ Created 1325 samples for zurich_city_01_b
+ Processing sequence: zurich_city_02_b
+Loaded 1225 timestamps
+Loaded 8399 tracks
+✅ Created 1225 samples for zurich_city_02_b
+ Processing sequence: zurich_city_02_e
+Loaded 1845 timestamps
+Loaded 6419 tracks
+✅ Created 1845 samples for zurich_city_02_e
+ Processing sequence: zurich_city_09_a
+Loaded 1813 timestamps
+Loaded 7899 tracks
+✅ Created 1813 samples for zurich_city_09_a
+ Processing sequence: zurich_city_19_a
+Loaded 1637 timestamps
+Loaded 4885 tracks
+✅ Created 1637 samples for zurich_city_19_a
+ Processing sequence: zurich_city_01_a
+Loaded 681 timestamps
+Loaded 3844 tracks
+✅ Created 681 samples for zurich_city_01_a
+ Processing sequence: zurich_city_00_a
+Loaded 939 timestamps
+Loaded 7446 tracks
+✅ Created 939 samples for zurich_city_00_a
+ Processing sequence: interlaken_00_d
+Loaded 1991 timestamps
+Loaded 3607 tracks
+✅ Created 1991 samples for interlaken_00_d
+ Processing sequence: zurich_city_10_b
+Loaded 2405 timestamps
+Loaded 10611 tracks
+✅ Created 2405 samples for zurich_city_10_b
+ Processing sequence: zurich_city_10_a
+Loaded 2315 timestamps
+Loaded 5606 tracks
+✅ Created 2315 samples for zurich_city_10_a
+ Processing sequence: thun_00_a
+Loaded 239 timestamps
+Loaded 912 tracks
+✅ Created 239 samples for thun_00_a
+ Processing sequence: zurich_city_04_a
+Loaded 701 timestamps
+Loaded 7037 tracks
+✅ Created 701 samples for zurich_city_04_a
+ Processing sequence: zurich_city_09_d
+Loaded 1699 timestamps
+Loaded 11250 tracks
+✅ Created 1699 samples for zurich_city_09_d
+ Processing sequence: zurich_city_06_a
+Loaded 1523 timestamps
+Loaded 4797 tracks
+✅ Created 1523 samples for zurich_city_06_a
+Total samples loaded: 63239
+DSEC-Det Dataset: Loaded 63239 samples for val split
+Validation dataset loaded: 63239 samples
+
+Creating model...
+Model created: ResNet50 with fpn_fusion fusion
+Number of classes: 8
+Model moved to GPU
+
+============================================================
+STARTING TRAINING
+============================================================
+
+--- Epoch 1/5 ---
