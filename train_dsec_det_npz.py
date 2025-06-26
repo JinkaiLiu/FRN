@@ -184,6 +184,11 @@ def train_epoch(dataloader, retinanet, optimizer, epoch_num, start_time, loss_th
     """
     Train for one epoch
     """
+
+    pid = os.getpid()
+   
+    print(f"[PID {pid}] Starting train_epoch {epoch_num}")
+
     retinanet.train()
     if hasattr(retinanet.module, 'freeze_bn'):
         retinanet.module.freeze_bn()
@@ -192,8 +197,13 @@ def train_epoch(dataloader, retinanet, optimizer, epoch_num, start_time, loss_th
     epoch_losses = []
     valid_iterations = 0
     total_iterations = 0
+
+    print(f"[PID {pid}] Starting dataloader iteration for epoch {epoch_num}...")
     
     for iter_num, data in enumerate(dataloader):
+        if iter_num == 0:
+            print(f"[PID {pid}] Got first batch {iter_num} for epoch {epoch_num}")
+
         total_iterations += 1
         
         cls_loss, reg_loss, total_loss = safe_training_step(

@@ -5,7 +5,7 @@ DSEC Detection Training with mAP Evaluation
 ============================================================
 Root directory: /media/data/hucao/zhenwu/hucao/DSEC/DSEC_Det
 Batch size: 2
-Num workers: 4
+Num workers: 8
 Learning rate: 5e-05
 Loss threshold: 50.0
 Epochs: 5
@@ -409,3 +409,5 @@ STARTING TRAINING
 ============================================================
 
 --- Epoch 1/5 ---
+[PID 2561438] Starting train_epoch 0
+[PID 2561438] Starting dataloader iteration for epoch 0...
