@@ -1,0 +1,63 @@
+from pathlib import Path
+import torch
+from torch.utils.data import Dataset, DataLoader
+
+# --- Wrapper: converts DAGR DSEC Data object to dict sample ---
+class DSECDAGRWrapper(Dataset):
+    def __init__(self, dsec_dataset):
+        self.dataset = dsec_dataset
+
+    def __len__(self):
+        return len(self.dataset)
+
+    def __getitem__(self, idx):
+        data = self.dataset[idx]
+
+        # Event image (C, H, W)
+        img_event = data.x if hasattr(data, 'x') else torch.zeros(5, 480, 640)
+
+        # RGB image (C, H, W)
+        img_rgb = data.image[0] if hasattr(data, 'image') else torch.zeros(3, 480, 640)
+
+        # Annotations [x1, y1, x2, y2, class_id]
+        if hasattr(data, 'bbox') and data.bbox.shape[0] > 0:
+            bboxes = data.bbox.clone()
+            bboxes[:, 2] += bboxes[:, 0]
+            bboxes[:, 3] += bboxes[:, 1]
+            annot = bboxes
+        else:
+            annot = torch.zeros((0, 5), dtype=torch.float32)
+
+        return {
+            'img': img_event.float(),
+            'img_rgb': img_rgb.float(),
+            'annot': annot.float(),
+            'sequence': getattr(data, 'sequence', ''),
+            'timestamp': getattr(data, 't1', torch.tensor(0)).item(),
+            'image_index': idx
+        }
+
+# --- DataLoader Factory ---
+def create_fast_dataloader_from_dagr(root_path, split='train', batch_size=4, num_workers=4, transform=None, collate_fn=None
+
+    dataset_dagr = DSEC(
+        root=Path(root_path),
+        split=split,
+        transform=transform,
+        debug=False,
+        no_eval=False
+    )
+
+    dataset = DSECDAGRWrapper(dataset_dagr)
+
+    dataloader = DataLoader(
+        dataset,
+        batch_size=batch_size,
+        shuffle=(split == 'train'),
+        num_workers=num_workers,
+        collate_fn=collate_fn,
+        pin_memory=torch.cuda.is_available(),
+        drop_last=(split == 'train')
+    )
+
+    return dataloader, dataset
