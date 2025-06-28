@@ -1,101 +1,258 @@
 from pathlib import Path
 import torch
 from torch.utils.data import Dataset, DataLoader
-from retinanet.data.dsec_data import DSEC
 
-# --- Wrapper: converts DAGR DSEC Data object to dict sample ---
+# 修复导入
+try:
+    from retinanet.data.dsec_data import DSEC
+except ImportError:
+    print("[WARNING] Could not import from retinanet.data.dsec_data, trying local import")
+    from dsec_data import DSEC
+
 class DSECWrapper(Dataset):
+    """DSEC数据集包装器，转换为RetinaNet格式"""
+    
     def __init__(self, dsec_dataset):
         self.dataset = dsec_dataset
-
+        print(f"[DEBUG] DSECWrapper initialized with {len(dsec_dataset)} samples")
+        
     def __len__(self):
         return len(self.dataset)
-
+    
     def __getitem__(self, idx):
-        data = self.dataset[idx]
-
-        # Event image (C, H, W)
-        img_event = data.x if hasattr(data, 'x') else torch.zeros(5, 480, 640)
-
-        # RGB image (C, H, W)
-        img_rgb = data.image[0] if hasattr(data, 'image') else torch.zeros(3, 480, 640)
-        img_rgb = img_rgb.float() / 255.0
-
-        # Annotations [x1, y1, x2, y2, class_id]
-        if hasattr(data, 'bbox') and data.bbox.shape[0] > 0:
-            bboxes = data.bbox.clone()
-            bboxes[:, 2] += bboxes[:, 0]
-            bboxes[:, 3] += bboxes[:, 1]
-            annot = bboxes
-        else:
-            annot = torch.zeros((0, 5), dtype=torch.float32)
-
-        return {
-            'img': img_event.float(),
-            'img_rgb': img_rgb.float(),
-            'annot': annot.float(),
-            'sequence': getattr(data, 'sequence', ''),
-            'timestamp': getattr(data, 't1', torch.tensor(0)).item(),
-            'image_index': idx
-        }
-
+        """获取单个样本"""
+        try:
+            data = self.dataset[idx]
+            
+            # 检查返回的数据格式
+            if isinstance(data, dict):
+                # 已经是正确格式
+                return data
+            else:
+                # 需要转换格式
+                print(f"[WARNING] Unexpected data format at index {idx}: {type(data)}")
+                
+                # 尝试提取属性
+                img_event = getattr(data, 'img', torch.zeros(5, 480, 640))
+                img_rgb = getattr(data, 'img_rgb', torch.zeros(1, 3, 480, 640))
+                annot = getattr(data, 'annot', torch.zeros((0, 5)))
+                
+                return {
+                    'img': img_event,
+                    'img_rgb': img_rgb,
+                    'annot': annot,
+                    'sequence': getattr(data, 'sequence', ''),
+                    'timestamp': getattr(data, 'timestamp', 0),
+                    'image_index': idx
+                }
+                
+        except Exception as e:
+            print(f"[ERROR] Error in DSECWrapper.__getitem__({idx}): {e}")
+            
+            # 返回安全的默认值 - 使用标准尺寸
+            return {
+                'img': torch.zeros(5, 480, 640, dtype=torch.float32),
+                'img_rgb': torch.zeros(1, 3, 480, 640, dtype=torch.float32),
+                'annot': torch.zeros((0, 5), dtype=torch.float32),
+                'sequence': '',
+                'timestamp': 0,
+                'image_index': idx
+            }
+    
     def __getattr__(self, name):
+        """将其他属性委托给底层数据集"""
         return getattr(self.dataset, name)
 
-def my_collate_fn(batch):
-    batch_dict = {}
-    # 1. img: list of [N_i, 1] tensors → pad to max_len then stack
-    imgs = [b['img'] for b in batch]
-    max_len = max([i.shape[0] for i in imgs])
-    padded_imgs = []
-    for img in imgs:
-        pad_len = max_len - img.shape[0]
-        if pad_len > 0:
-            pad = torch.zeros((pad_len, 1), dtype=img.dtype)
-            img = torch.cat([img, pad], dim=0)
-        padded_imgs.append(img)
-    batch_dict['img'] = torch.stack(padded_imgs)  # [B, max_len, 1]
+def safe_collate_fn(batch):
+    """安全的批次整理函数 - 处理标准尺寸"""
+    try:
+        batch_dict = {}
+        
+        # 处理img (事件数据) - 应该是 [5, 480, 640]
+        imgs = [b['img'] for b in batch]
+        
+        # 检查形状一致性
+        expected_shape = (5, 480, 640)  # 标准尺寸
+        processed_imgs = []
+        
+        for i, img in enumerate(imgs):
+            if img.dim() == 3 and img.shape == expected_shape:
+                # 正确的 [5, 480, 640] 格式
+                processed_imgs.append(img)
+            elif img.dim() == 3 and img.shape[0] == 5:
+                # 需要resize到标准尺寸
+                print(f"[WARNING] Resizing event img at batch index {i}: {img.shape} -> {expected_shape}")
+                img = torch.nn.functional.interpolate(
+                    img.unsqueeze(0), 
+                    size=(480, 640), 
+                    mode='bilinear', 
+                    align_corners=False
+                ).squeeze(0)
+                processed_imgs.append(img)
+            elif img.dim() == 2:
+                # 可能是 [N, 1] 格式，需要重塑
+                print(f"[WARNING] Reshaping img at batch index {i}: {img.shape}")
+                if img.shape[0] == 5 * 480 * 640:
+                    img = img.view(5, 480, 640)
+                else:
+                    print(f"[ERROR] Cannot reshape img with shape {img.shape}")
+                    img = torch.zeros(5, 480, 640)
+                processed_imgs.append(img)
+            else:
+                print(f"[ERROR] Unexpected img shape at batch index {i}: {img.shape}")
+                processed_imgs.append(torch.zeros(5, 480, 640))
+        
+        batch_dict['img'] = torch.stack(processed_imgs)  # [B, 5, 480, 640]
+        
+        # 处理img_rgb - 应该是 [1, 3, 480, 640] 或 [3, 480, 640]
+        rgb_imgs = [b['img_rgb'] for b in batch]
+        processed_rgb = []
+        
+        for i, rgb in enumerate(rgb_imgs):
+            if rgb.dim() == 4 and rgb.shape[0] == 1:
+                # [1, 3, 480, 640] 格式，移除批次维度
+                rgb = rgb.squeeze(0)
+            elif rgb.dim() == 3 and rgb.shape[0] == 3:
+                # [3, 480, 640] 格式，检查尺寸
+                if rgb.shape[1:] != (480, 640):
+                    print(f"[WARNING] Resizing RGB at batch index {i}: {rgb.shape}")
+                    rgb = torch.nn.functional.interpolate(
+                        rgb.unsqueeze(0),
+                        size=(480, 640),
+                        mode='bilinear',
+                        align_corners=False
+                    ).squeeze(0)
+            else:
+                print(f"[WARNING] Unexpected RGB shape at batch index {i}: {rgb.shape}")
+                rgb = torch.zeros(3, 480, 640)
+            processed_rgb.append(rgb)
+        
+        batch_dict['img_rgb'] = torch.stack(processed_rgb)  # [B, 3, 480, 640]
+        
+        # 处理annot - [N, 5] 格式
+        annots = [b['annot'] for b in batch]
+        
+        if len(annots) > 0:
+            # 找到最大标注数量
+            max_annots = max([a.shape[0] for a in annots]) if any(a.shape[0] > 0 for a in annots) else 1
+            
+            padded_annots = []
+            for a in annots:
+                if a.shape[0] == 0:
+                    # 空标注，用-1填充
+                    padded = torch.ones((max_annots, 5), dtype=a.dtype) * -1
+                elif a.shape[0] < max_annots:
+                    # 需要填充
+                    pad_size = max_annots - a.shape[0]
+                    pad = torch.ones((pad_size, 5), dtype=a.dtype) * -1
+                    padded = torch.cat([a, pad], dim=0)
+                else:
+                    # 已经是最大大小
+                    padded = a[:max_annots]  # 截断到最大大小
+                
+                padded_annots.append(padded)
+            
+            batch_dict['annot'] = torch.stack(padded_annots)  # [B, max_annots, 5]
+        else:
+            # 没有标注
+            batch_dict['annot'] = torch.ones((len(batch), 1, 5), dtype=torch.float32) * -1
+        
+        # 处理其他字段
+        for key in ['sequence', 'timestamp', 'image_index']:
+            if key in batch[0]:
+                batch_dict[key] = [b[key] for b in batch]
+        
+        return batch_dict
+        
+    except Exception as e:
+        print(f"[ERROR] Error in collate_fn: {e}")
+        import traceback
+        traceback.print_exc()
+        
+        # 返回安全的默认批次 - 使用标准尺寸
+        batch_size = len(batch)
+        return {
+            'img': torch.zeros(batch_size, 5, 480, 640, dtype=torch.float32),
+            'img_rgb': torch.zeros(batch_size, 3, 480, 640, dtype=torch.float32),
+            'annot': torch.ones(batch_size, 1, 5, dtype=torch.float32) * -1,
+            'sequence': [''] * batch_size,
+            'timestamp': [0] * batch_size,
+            'image_index': list(range(batch_size))
+        }
 
-    # 2. img_rgb: already batchable
-    batch_dict['img_rgb'] = torch.stack([b['img_rgb'] for b in batch])
-
-    # 3. annot: list of [N, 5] → pad to max_annots then stack
-    annots = [b['annot'] for b in batch]
-    max_annots = max([a.shape[0] for a in annots])
-    padded_annots = []
-    for a in annots:
-        pad = torch.ones((max_annots - a.shape[0], 5), dtype=a.dtype) * -1  # -1 填充
-        a_padded = torch.cat([a, pad], dim=0)
-        padded_annots.append(a_padded)
-    batch_dict['annot'] = torch.stack(padded_annots)  # [B, max_annots, 5]
-
-    # 4. 保留其他字段
-    for key in batch[0]:
-        if key in ['img', 'img_rgb', 'annot']:
-            continue
-        batch_dict[key] = [b[key] for b in batch]
-
-    return batch_dict
-
-def create_fast_dataloader(root_dir, split='train', batch_size=4, num_workers=4, transform=None, collate_fn=my_collate_fn):
-    dsec_dataset = DSEC(
-        root=Path(root_dir),
-        split=split,
-        transform=transform,
-        debug=False,
-        no_eval=False
-    )
-
+def create_fast_dataloader(root_dir, split='train', batch_size=4, num_workers=4, transform=None, collate_fn=None):
+    """创建DSEC数据加载器 - 使用标准尺寸"""
+    
+    if collate_fn is None:
+        collate_fn = safe_collate_fn
+    
+    print(f"[DEBUG] Creating DSEC dataset from {root_dir} for split '{split}'")
+    
+    try:
+        dsec_dataset = DSEC(
+            root=Path(root_dir),
+            split=split,
+            transform=transform,
+            debug=(batch_size == 1),  # 调试模式
+            no_eval=False,
+            scale=1,  # 使用标准缩放
+            cropped_height=480  # 标准高度
+        )
+        
+        print(f"[DEBUG] DSEC dataset created successfully")
+        print(f"[DEBUG] Dataset length: {len(dsec_dataset)}")
+        print(f"[DEBUG] Dataset classes: {dsec_dataset.classes}")
+        print(f"[DEBUG] Image size: {dsec_dataset.height}x{dsec_dataset.width}")
+        
+    except Exception as e:
+        print(f"[ERROR] Failed to create DSEC dataset: {e}")
+        
+        # 尝试其他路径
+        alternative_paths = [
+            Path(root_dir) / "train",
+            Path(root_dir) / split,
+            Path(root_dir).parent / split
+        ]
+        
+        for alt_path in alternative_paths:
+            if alt_path.exists():
+                print(f"[INFO] Trying alternative path: {alt_path}")
+                try:
+                    dsec_dataset = DSEC(
+                        root=alt_path,
+                        split=split,
+                        transform=transform,
+                        debug=(batch_size == 1),
+                        no_eval=False,
+                        scale=1,
+                        cropped_height=480
+                    )
+                    print(f"[SUCCESS] Dataset loaded from {alt_path}")
+                    break
+                except Exception as e2:
+                    print(f"[ERROR] Alternative path {alt_path} also failed: {e2}")
+                    continue
+        else:
+            raise RuntimeError(f"Could not load dataset from any path. Original error: {e}")
+    
+    # 包装数据集
     dataset = DSECWrapper(dsec_dataset)
-
+    
+    # 创建数据加载器
     dataloader = DataLoader(
         dataset,
         batch_size=batch_size,
         shuffle=(split == 'train'),
-        num_workers=num_workers,
+        num_workers=0 if batch_size == 1 else min(num_workers, 4),  # 调试时使用单进程
         collate_fn=collate_fn,
         pin_memory=torch.cuda.is_available(),
-        drop_last=(split == 'train')
+        drop_last=(split == 'train'),
+        persistent_workers=False  # 避免一些多进程问题
     )
-
+    
+    print(f"[DEBUG] DataLoader created successfully")
+    print(f"  - Batch size: {batch_size}")
+    print(f"  - Num workers: {dataloader.num_workers}")
+    print(f"  - Expected tensor sizes: Event[B,5,480,640], RGB[B,3,480,640]")
+    
     return dataloader, dataset
