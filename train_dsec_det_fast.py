@@ -128,9 +128,9 @@ def debug_batch_data(data_batch, batch_idx):
             print(f"  Annotation {i}: [{x1:.1f}, {y1:.1f}, {x2:.1f}, {y2:.1f}] w={w:.1f} h={h:.1f} cls={int(cls)}")
             
             if x2 <= x1 or y2 <= y1 or w < 1 or h < 1:
-                print(f"    ❌ Still has issues!")
+                print(f"    Still has issues!")
             else:
-                print(f"    ✅ Fixed")
+                print(f"    Fixed")
     
     issues = []
     
@@ -147,12 +147,12 @@ def debug_batch_data(data_batch, batch_idx):
             issues.append(f"Some annotations invalid (fixed: {len(valid_annot)}/{sample_annot.shape[0]})")
     
     if issues:
-        print(f"\n⚠️  Found {len(issues)} issues:")
+        print(f"\n  Found {len(issues)} issues:")
         for issue in issues:
             print(f"  - {issue}")
         return True
     else:
-        print("\n✅ Batch data normal")
+        print("\ Batch data normal")
         return True
 
 
@@ -423,7 +423,7 @@ def main():
         for batch_idx, data in enumerate(dataloader_train):
             success = debug_batch_data(data, batch_idx)
             if not success:
-                print(f"❌ Batch {batch_idx} has unfixable issues!")
+                print(f" Batch {batch_idx} has unfixable issues!")
             if batch_idx >= 4:
                 break
         
