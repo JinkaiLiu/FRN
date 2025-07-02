@@ -35,7 +35,7 @@ def try_reshape(img_event, in_channels, H_list=[128, 96, 64]):
 if __name__ == "__main__":
     # 加载你的模型
     from retinanet.model import resnet50  # 你模型初始化的方法
-    model = resnet50(dataset_name='dsec', num_classes=8, fusion_model='fpn_fusion')
+    model = resnet50(num_classes=2, fusion')
     model.eval()
 
     # 模拟一批 img_event 输入
