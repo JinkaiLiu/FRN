@@ -285,7 +285,9 @@ def safe_training_step(retinanet, data, optimizer, iter_num, loss_threshold=50.0
 def train_epoch(dataloader, retinanet, optimizer, epoch_num, start_time, loss_threshold=50.0,
                scaler=None, use_amp=False):
     retinanet.train()
-    if hasattr(retinanet.module, 'freeze_bn'):
+    if hasattr(retinanet, 'freeze_bn'):
+        retinanet.freeze_bn()
+    elif hasattr(retinanet, 'module') and hasattr(retinanet.module, 'freeze_bn'):
         retinanet.module.freeze_bn()
     
     loss_hist = collections.deque(maxlen=100)
@@ -443,10 +445,10 @@ def main():
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     if torch.cuda.is_available():
         retinanet = retinanet.cuda()
-        retinanet = torch.nn.DataParallel(retinanet).cuda()
+        #retinanet = torch.nn.DataParallel(retinanet).cuda()
         print("Model moved to GPU")
     else:
-        retinanet = torch.nn.DataParallel(retinanet)
+        #retinanet = torch.nn.DataParallel(retinanet)
         print("Using CPU")
     
     optimizer = optim.Adam(retinanet.parameters(), lr=args.learning_rate)
@@ -522,7 +524,7 @@ def main():
                 best_model_path = f'{args.save_dir}/best_model_fixed.pt'
                 save_dict = {
                     'epoch': epoch,
-                    'model_state_dict': retinanet.module.state_dict(),
+                    'model_state_dict': retinanet.state_dict() if not hasattr(retinanet, 'module') else retinanet.module.state_dict(),
                     'optimizer_state_dict': optimizer.state_dict(),
                     'loss': avg_epoch_loss,
                     'map': current_map,
@@ -557,7 +559,7 @@ def main():
             save_path = f'{args.save_dir}/dsec_retinanet_fixed_epoch_{epoch}.pt'
             save_dict = {
                 'epoch': epoch,
-                'model_state_dict': retinanet.module.state_dict(),
+                'model_state_dict': retinanet.state_dict() if not hasattr(retinanet, 'module') else retinanet.module.state_dict(),
                 'optimizer_state_dict': optimizer.state_dict(),
                 'loss': avg_epoch_loss,
                 'map': current_map,
@@ -581,7 +583,7 @@ def main():
     final_path = f'{args.save_dir}/dsec_retinanet_fixed_final.pt'
     final_dict = {
         'epoch': args.epochs,
-        'model_state_dict': retinanet.module.state_dict(),
+        'model_state_dict': retinanet.state_dict() if not hasattr(retinanet, 'module') else retinanet.module.state_dict(),
         'optimizer_state_dict': optimizer.state_dict(),
         'train_log': train_log,
         'best_map': best_map,
