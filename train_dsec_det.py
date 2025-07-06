@@ -268,7 +268,7 @@ def safe_training_step(retinanet, data, optimizer, iter_num, loss_threshold=50.0
             grad_norm = torch.nn.utils.clip_grad_norm_(retinanet.parameters(), 1.0)
             optimizer.step()
         
-        if iter_num % 500 == 0:
+        if iter_num % 50 == 0:
             print(f"Iteration {iter_num}: Success - loss={total_loss.item():.4f}")
             valid_annots = valid_annot_mask.sum().item()
             print(f"  Valid annotations: {valid_annots}, event range: [{img_event.min():.3f}, {img_event.max():.3f}]")
@@ -306,7 +306,7 @@ def train_epoch(dataloader, retinanet, optimizer, epoch_num, start_time, loss_th
             valid_iterations += 1
             loss_hist.append(total_loss)
             
-            if iter_num % 100 == 0:
+            if iter_num % 10 == 0:
                 avg_loss = np.mean(loss_hist) if loss_hist else 0
                 valid_rate = 100 * valid_iterations / total_iterations
                 print(f'[{time_since(start_time)}] Epoch {epoch_num} | Iter {iter_num} | '
@@ -352,9 +352,9 @@ def evaluate_epoch(retinanet, dataset_val, epoch_num, save_folder):
 
 
 def main():
-    parser = argparse.ArgumentParser(description='DSEC Detection Training Script')
+    parser = argparse.ArgumentParser(description='DSEC Detection Training Script (Fixed Version)')
     
-    parser.add_argument('--root_dir', default='/media/data/hucao/zhenwu/hucao/DSEC/DSEC_Det',
+    parser.add_argument('--root_dir', default='/media/data/hucao/zhenwu/hucao/DSEC/DSEC_Det', 
                        help='DSEC dataset root directory')
     parser.add_argument('--batch_size', type=int, default=2, help='Batch size')
     parser.add_argument('--num_workers', type=int, default=8, help='Number of data loading workers')
@@ -365,7 +365,7 @@ def main():
     
     parser.add_argument('--fusion', default='fpn_fusion', choices=['fpn_fusion', 'rgb', 'event'],
                        help='Fusion model type')
-    parser.add_argument('--depth', type=int, default=50, choices=[18, 34, 50],
+    parser.add_argument('--depth', type=int, default=50, choices=[18, 34, 50], 
                        help='ResNet depth')
     
     parser.add_argument('--eval_interval', type=int, default=5, help='Evaluation interval (epochs)')
@@ -376,7 +376,7 @@ def main():
     parser.add_argument('--debug_data', action='store_true', help='Enable data debugging')
     parser.add_argument('--continue_training', action='store_true', help='Continue training from checkpoint')
     parser.add_argument('--checkpoint', default='', help='Checkpoint path')
-    parser.add_argument('--save_dir', default='/media/data/hucao/jinkai/FRN/results_dsec_det/FRN_version',
+    parser.add_argument('--save_dir', default='/media/data/hucao/zehua/results_dsec/fixed_version',
                        help='Directory to save checkpoints')
     
     args = parser.parse_args()
@@ -384,7 +384,7 @@ def main():
     os.makedirs(args.save_dir, exist_ok=True)
     
     print("="*60)
-    print("DSEC Detection Training Script")
+    print("DSEC Detection Training Script (Fixed Version)")
     print("="*60)
     print(f"Root directory: {args.root_dir}")
     print(f"Batch size: {args.batch_size}")
@@ -419,7 +419,7 @@ def main():
     
     if args.debug_data:
         print("\n" + "="*40)
-        print("Data Debug Mode")
+        print("Data Debug Mode (Fixed Version)")
         print("="*40)
         
         for batch_idx, data in enumerate(dataloader_train):
@@ -470,7 +470,7 @@ def main():
             optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
             if scaler and 'scaler_state_dict' in checkpoint:
                 scaler.load_state_dict(checkpoint['scaler_state_dict'])
-            start_epoch = checkpoint.get('epoch', 0)
+            start_epoch = checkpoint.get('epoch', 0) + 1
             best_map = checkpoint.get('best_map', 0.0)
             best_epoch = checkpoint.get('best_epoch', 0)
             print(f"Resumed from epoch {start_epoch}, best mAP: {best_map:.4f} (epoch {best_epoch})")
@@ -479,7 +479,7 @@ def main():
             start_epoch = 0
     
     print(f"\n" + "="*60)
-    print("Starting Training")
+    print("Starting Training (Fixed Version)")
     print("="*60)
     
     start_time = time.time()
@@ -493,7 +493,7 @@ def main():
         )
         
         current_map = 0.0
-        if (epoch + 1) % args.eval_interval == 0 or epoch == args.epochs - 1 or epoch == 1:
+        if (epoch + 1) % args.eval_interval == 0 or epoch == args.epochs - 1:
             current_map = evaluate_epoch(retinanet, dataset_val, epoch, args.save_dir)
             
             if args.eval_coco:

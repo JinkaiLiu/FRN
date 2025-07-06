@@ -34,7 +34,7 @@ def _compute_ap(recall, precision):
     return ap
 
 def _get_detections(dataset, retinanet, score_threshold=0.05, max_detections=100, save_path=None):
-    all_detections = [[None for i in range(dataset.num_classes())] for j in range(len(dataset))]
+    all_detections = [[None for i in range(dataset.num_classes)] for j in range(len(dataset))]
 
     retinanet.eval()
     
@@ -115,11 +115,11 @@ def _get_detections(dataset, retinanet, score_threshold=0.05, max_detections=100
                     ], axis=1)
 
                     # Group by class
-                    for label in range(dataset.num_classes()):
+                    for label in range(dataset.num_classes):
                         all_detections[index][label] = image_detections[image_detections[:, -1] == label, :-1]
                 else:
                     # No detections found
-                    for label in range(dataset.num_classes()):
+                    for label in range(dataset.num_classes):
                         all_detections[index][label] = np.zeros((0, 5))
 
                 if (index + 1) % 100 == 0:
@@ -128,14 +128,14 @@ def _get_detections(dataset, retinanet, score_threshold=0.05, max_detections=100
             except Exception as e:
                 print(f"Error processing sample {index}: {e}")
                 # Create empty detection results
-                for label in range(dataset.num_classes()):
+                for label in range(dataset.num_classes):
                     all_detections[index][label] = np.zeros((0, 5))
                 continue
 
     return all_detections
 
 def _get_annotations(generator):
-    all_annotations = [[None for i in range(generator.num_classes())] for j in range(len(generator))]
+    all_annotations = [[None for i in range(generator.num_classes)] for j in range(len(generator))]
 
     for i in range(len(generator)):
         try:
@@ -154,7 +154,7 @@ def _get_annotations(generator):
                 valid_annotations = np.zeros((0, 5))
             
             # Group annotations by class
-            for label in range(generator.num_classes()):
+            for label in range(generator.num_classes):
                 if len(valid_annotations) > 0:
                     class_annotations = valid_annotations[valid_annotations[:, 4] == label, :4].copy()
                     all_annotations[i][label] = class_annotations
@@ -164,7 +164,7 @@ def _get_annotations(generator):
         except Exception as e:
             print(f"Error loading annotations for sample {i}: {e}")
             # Create empty annotations
-            for label in range(generator.num_classes()):
+            for label in range(generator.num_classes):
                 all_annotations[i][label] = np.zeros((0, 4))
 
         if (i + 1) % 100 == 0:
@@ -207,12 +207,12 @@ def evaluate_coco_map(
     # Compute AP at different IoU thresholds
     average_precisions = {}
     average_precisions_coco = {}
-    for label in range(generator.num_classes()):
+    for label in range(generator.num_classes):
         average_precisions_coco[label] = []
 
     iou_values = np.arange(0.5, 1.00, 0.05).tolist()
 
-    for label in range(generator.num_classes()):
+    for label in range(generator.num_classes):
         false_positives = []
         true_positives = []
         for idx, iou_threshold1 in enumerate(iou_values):
@@ -321,7 +321,7 @@ def evaluate(
 
     average_precisions = {}
 
-    for label in range(generator.num_classes()):
+    for label in range(generator.num_classes):
         false_positives = np.zeros((0,))
         true_positives = np.zeros((0,))
         scores = np.zeros((0,))
