@@ -466,7 +466,10 @@ def main():
         print(f"\nLoading checkpoint: {args.checkpoint}")
         try:
             checkpoint = torch.load(args.checkpoint)
-            retinanet.module.load_state_dict(checkpoint['model_state_dict'])
+            if hasattr(retinanet, 'module'):
+                retinanet.module.load_state_dict(checkpoint['model_state_dict'])
+            else:
+                retinanet.load_state_dict(checkpoint['model_state_dict'])
             optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
             if scaler and 'scaler_state_dict' in checkpoint:
                 scaler.load_state_dict(checkpoint['scaler_state_dict'])
@@ -493,7 +496,7 @@ def main():
         )
         
         current_map = 0.0
-        if (epoch + 1) % args.eval_interval == 0 or epoch == args.epochs - 1 or epoch == 1:
+        if (epoch + 1) % args.eval_interval == 0 or epoch == args.epochs - 1 or epoch == 0:
             current_map = evaluate_epoch(retinanet, dataset_val, epoch, args.save_dir)
             
             if args.eval_coco:

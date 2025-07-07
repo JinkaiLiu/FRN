@@ -12,11 +12,16 @@ class DSECWrapper(Dataset):
     
     def __init__(self, dsec_dataset):
         self.dataset = dsec_dataset
+        self.num_classes = 2
         print(f"[DEBUG] DSECWrapper initialized with {len(dsec_dataset)} samples")
         
     def __len__(self):
         return len(self.dataset)
-    
+
+    def label_to_name(self, label):
+        class_names = ['car', 'pedestrian']
+        return class_names[label] if label < len(class_names) else f'class_{label}'
+
     def __getitem__(self, idx):
         try:
             data = self.dataset[idx]

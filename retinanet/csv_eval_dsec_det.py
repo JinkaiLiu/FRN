@@ -50,19 +50,41 @@ def _get_detections(dataset, retinanet, score_threshold=0.05, max_detections=100
                 
                 # Process RGB image format
                 if isinstance(img_rgb, torch.Tensor):
-                    if len(img_rgb.shape) == 3:  # HWC format
-                        if img_rgb.shape[-1] == 3:  # Confirm HWC format
-                            img_rgb = img_rgb.permute(2, 0, 1)  # HWC -> CHW
-                        img_rgb = img_rgb.unsqueeze(0)  # CHW -> BCHW
-                    elif len(img_rgb.shape) == 4:  # BHWC format
-                        if img_rgb.shape[-1] == 3:
-                            img_rgb = img_rgb.permute(0, 3, 1, 2)  # BHWC -> BCHW
+                    if len(img_rgb.shape) == 4:
+                        if img_rgb.shape[1] == 3:
+                            pass
+                        elif img_rgb.shape[-1] == 3:
+                            img_rgb = img_rgb.permute(0, 3, 1, 2)
+                        else:
+                            print(f"Warning: Unexpected 4D RGB shape: {img_rgb.shape}")
+                    elif len(img_rgb.shape) == 3:
+                        if img_rgb.shape[0] == 3:
+                            img_rgb = img_rgb.unsqueeze(0)
+                        elif img_rgb.shape[-1] == 3:
+                            img_rgb = img_rgb.permute(2, 0, 1).unsqueeze(0)
+                        else:
+                            print(f"Warning: Unexpected 3D RGB shape: {img_rgb.shape}")
+                            img_rgb = img_rgb.unsqueeze(0)
                 else:
                     # Convert numpy array to tensor
                     if len(img_rgb.shape) == 3 and img_rgb.shape[-1] == 3:
                         img_rgb = torch.from_numpy(img_rgb).permute(2, 0, 1).unsqueeze(0)
                     else:
                         img_rgb = torch.from_numpy(img_rgb).unsqueeze(0)
+                #if isinstance(img_rgb, torch.Tensor):
+                #    if len(img_rgb.shape) == 3:  # HWC format
+                #        if img_rgb.shape[-1] == 3:  # Confirm HWC format
+                #            img_rgb = img_rgb.permute(2, 0, 1)  # HWC -> CHW
+                #        img_rgb = img_rgb.unsqueeze(0)  # CHW -> BCHW
+                #    elif len(img_rgb.shape) == 4:  # BHWC format
+                #        if img_rgb.shape[-1] == 3:
+                #            img_rgb = img_rgb.permute(0, 3, 1, 2)  # BHWC -> BCHW
+                #else:
+                #    # Convert numpy array to tensor
+                #    if len(img_rgb.shape) == 3 and img_rgb.shape[-1] == 3:
+                #        img_rgb = torch.from_numpy(img_rgb).permute(2, 0, 1).unsqueeze(0)
+                #    else:
+                #        img_rgb = torch.from_numpy(img_rgb).unsqueeze(0)
                 
                 # Process event image format
                 if isinstance(img_event, torch.Tensor):
