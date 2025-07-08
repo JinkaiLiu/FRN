@@ -1,3 +1,15 @@
 .vscode/
 .ipynb_checkpoints/
 __pycache__/
+checkpoints/
+resnet50-19c8e357.pth
+evaluation_test_results/
+results_dsec_det/
+__pycache__/
+*.pyc
+*.pyo
+*.log
+training.log
+train.log
+*.pt
+*.pth
