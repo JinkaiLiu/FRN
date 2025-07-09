@@ -12,7 +12,7 @@ class Anchors(nn.Module): #手动设置每个特征图对应的anchor基础框�
         if strides is None:
             self.strides = [2 ** x for x in self.pyramid_levels] #特征图大小为 [原图大小/8, 原图大小/16, 原图大小/32, 原图大小/64, 原图大小/128]
         if sizes is None:
-            self.sizes = [8, 16, 32, 64, 128]
+            self.sizes = [4, 8, 16, 32, 64]
             #self.sizes = [2 ** (x + 2) for x in self.pyramid_levels] #base_size设置为：[32,64,128,256,512]
             #即对于长宽为（原图大小/8，原图大小/8）的特征图，其特征图上的每个单元格cell对应原图区域上（32，32）大小的对应区域（这里对应的大小并不是实际感受野的大小，而是一种人为的近似设置）。
 
