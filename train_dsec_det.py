@@ -157,7 +157,7 @@ def debug_batch_data(data_batch, batch_idx):
 
 
 def safe_training_step(retinanet, data, optimizer, iter_num, loss_threshold=50.0,
-                      scaler=None, use_amp=False):
+                      scaler=None, use_amp=False, num_batches_counter=None, accumulate_steps=2):
     try:
         if isinstance(data['img_rgb'], list):
             img_rgb = torch.stack(data['img_rgb']).cuda(non_blocking=True).float()
@@ -235,8 +235,6 @@ def safe_training_step(retinanet, data, optimizer, iter_num, loss_threshold=50.0
             print(f"Iteration {iter_num}: No valid annotations, skipping")
             return None, None, None
         
-        optimizer.zero_grad()
-        
         if use_amp and scaler is not None:
             with autocast():
                 classification_loss, regression_loss = retinanet([img_rgb, img_event, annot])
@@ -257,18 +255,28 @@ def safe_training_step(retinanet, data, optimizer, iter_num, loss_threshold=50.0
             print(f"Iteration {iter_num}: Loss too large {total_loss.item():.1f} > {loss_threshold}")
             return None, None, None
         
+        if bool(total_loss == 0):
+            return None, None, None
+        
+        # 梯度累积
         if use_amp and scaler is not None:
             scaler.scale(total_loss).backward()
-            scaler.unscale_(optimizer)
-            grad_norm = torch.nn.utils.clip_grad_norm_(retinanet.parameters(), 1.0)
-            scaler.step(optimizer)
-            scaler.update()
         else:
             total_loss.backward()
-            grad_norm = torch.nn.utils.clip_grad_norm_(retinanet.parameters(), 1.0)
-            optimizer.step()
         
-        if iter_num % 50 == 0:
+        torch.nn.utils.clip_grad_norm_(retinanet.parameters(), 0.1)
+        
+        num_batches_counter[0] += 1
+        if num_batches_counter[0] == accumulate_steps:
+            if use_amp and scaler is not None:
+                scaler.step(optimizer)
+                scaler.update()
+            else:
+                optimizer.step()
+            optimizer.zero_grad()
+            num_batches_counter[0] = 0
+        
+        if iter_num % 500 == 0:
             print(f"Iteration {iter_num}: Success - loss={total_loss.item():.4f}")
             valid_annots = valid_annot_mask.sum().item()
             print(f"  Valid annotations: {valid_annots}, event range: [{img_event.min():.3f}, {img_event.max():.3f}]")
@@ -283,7 +291,7 @@ def safe_training_step(retinanet, data, optimizer, iter_num, loss_threshold=50.0
 
 
 def train_epoch(dataloader, retinanet, optimizer, epoch_num, start_time, loss_threshold=50.0,
-               scaler=None, use_amp=False):
+               scaler=None, use_amp=False, accumulate_steps=2):
     retinanet.train()
     if hasattr(retinanet, 'freeze_bn'):
         retinanet.freeze_bn()
@@ -294,19 +302,21 @@ def train_epoch(dataloader, retinanet, optimizer, epoch_num, start_time, loss_th
     epoch_losses = []
     valid_iterations = 0
     total_iterations = 0
+    num_batches_counter = [0]  # 使用列表来传递引用
     
     for iter_num, data in enumerate(dataloader):
         total_iterations += 1
         
         cls_loss, reg_loss, total_loss = safe_training_step(
-            retinanet, data, optimizer, iter_num, loss_threshold, scaler, use_amp
+            retinanet, data, optimizer, iter_num, loss_threshold, scaler, use_amp, 
+            num_batches_counter, accumulate_steps
         )
         
         if total_loss is not None:
             valid_iterations += 1
             loss_hist.append(total_loss)
             
-            if iter_num % 10 == 0:
+            if iter_num % 100 == 0:
                 avg_loss = np.mean(loss_hist) if loss_hist else 0
                 valid_rate = 100 * valid_iterations / total_iterations
                 print(f'[{time_since(start_time)}] Epoch {epoch_num} | Iter {iter_num} | '
@@ -316,6 +326,15 @@ def train_epoch(dataloader, retinanet, optimizer, epoch_num, start_time, loss_th
         
         if iter_num > 0 and iter_num % 100 == 0:
             torch.cuda.empty_cache()
+    
+    # 确保最后的梯度也被更新
+    if num_batches_counter[0] > 0:
+        if use_amp and scaler is not None:
+            scaler.step(optimizer)
+            scaler.update()
+        else:
+            optimizer.step()
+        optimizer.zero_grad()
     
     if epoch_losses:
         avg_epoch_loss = np.mean(epoch_losses)
@@ -352,9 +371,9 @@ def evaluate_epoch(retinanet, dataset_val, epoch_num, save_folder):
 
 
 def main():
-    parser = argparse.ArgumentParser(description='DSEC Detection Training Script (Fixed Version)')
+    parser = argparse.ArgumentParser(description='DSEC Detection Training Script')
     
-    parser.add_argument('--root_dir', default='/media/data/hucao/zhenwu/hucao/DSEC/DSEC_Det', 
+    parser.add_argument('--root_dir', default='/media/data/hucao/zhenwu/hucao/DSEC/DSEC_Det',
                        help='DSEC dataset root directory')
     parser.add_argument('--batch_size', type=int, default=2, help='Batch size')
     parser.add_argument('--num_workers', type=int, default=8, help='Number of data loading workers')
@@ -365,18 +384,19 @@ def main():
     
     parser.add_argument('--fusion', default='fpn_fusion', choices=['fpn_fusion', 'rgb', 'event'],
                        help='Fusion model type')
-    parser.add_argument('--depth', type=int, default=50, choices=[18, 34, 50], 
+    parser.add_argument('--depth', type=int, default=50, choices=[18, 34, 50],
                        help='ResNet depth')
     
     parser.add_argument('--eval_interval', type=int, default=5, help='Evaluation interval (epochs)')
     parser.add_argument('--eval_coco', action='store_true', help='Also evaluate COCO-style mAP')
     
     parser.add_argument('--use_amp', action='store_true', help='Use automatic mixed precision')
+    parser.add_argument('--accumulate_steps', type=int, default=2, help='Gradient accumulation steps')
     
     parser.add_argument('--debug_data', action='store_true', help='Enable data debugging')
     parser.add_argument('--continue_training', action='store_true', help='Continue training from checkpoint')
     parser.add_argument('--checkpoint', default='', help='Checkpoint path')
-    parser.add_argument('--save_dir', default='/media/data/hucao/zehua/results_dsec/fixed_version',
+    parser.add_argument('--save_dir', default='/media/data/hucao/jinkai/FRN/results_dsec_det/FRN_version',
                        help='Directory to save checkpoints')
     
     args = parser.parse_args()
@@ -384,7 +404,7 @@ def main():
     os.makedirs(args.save_dir, exist_ok=True)
     
     print("="*60)
-    print("DSEC Detection Training Script (Fixed Version)")
+    print("DSEC Detection Training Script")
     print("="*60)
     print(f"Root directory: {args.root_dir}")
     print(f"Batch size: {args.batch_size}")
@@ -394,6 +414,7 @@ def main():
     print(f"Training epochs: {args.epochs}")
     print(f"Fusion model: {args.fusion}")
     print(f"Mixed precision: {args.use_amp}")
+    print(f"Gradient accumulation steps: {args.accumulate_steps}")
     print(f"Evaluation interval: {args.eval_interval}")
     print(f"COCO evaluation: {args.eval_coco}")
     
@@ -419,7 +440,7 @@ def main():
     
     if args.debug_data:
         print("\n" + "="*40)
-        print("Data Debug Mode (Fixed Version)")
+        print("Data Debug Mode")
         print("="*40)
         
         for batch_idx, data in enumerate(dataloader_train):
@@ -445,10 +466,8 @@ def main():
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     if torch.cuda.is_available():
         retinanet = retinanet.cuda()
-        #retinanet = torch.nn.DataParallel(retinanet).cuda()
         print("Model moved to GPU")
     else:
-        #retinanet = torch.nn.DataParallel(retinanet)
         print("Using CPU")
     
     optimizer = optim.Adam(retinanet.parameters(), lr=args.learning_rate)
@@ -466,11 +485,14 @@ def main():
         print(f"\nLoading checkpoint: {args.checkpoint}")
         try:
             checkpoint = torch.load(args.checkpoint)
-            retinanet.module.load_state_dict(checkpoint['model_state_dict'])
+            if hasattr(retinanet, 'module'):
+                retinanet.module.load_state_dict(checkpoint['model_state_dict'])
+            else:
+                retinanet.load_state_dict(checkpoint['model_state_dict'])
             optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
             if scaler and 'scaler_state_dict' in checkpoint:
                 scaler.load_state_dict(checkpoint['scaler_state_dict'])
-            start_epoch = checkpoint.get('epoch', 0) + 1
+            start_epoch = checkpoint.get('epoch', 0)
             best_map = checkpoint.get('best_map', 0.0)
             best_epoch = checkpoint.get('best_epoch', 0)
             print(f"Resumed from epoch {start_epoch}, best mAP: {best_map:.4f} (epoch {best_epoch})")
@@ -479,7 +501,7 @@ def main():
             start_epoch = 0
     
     print(f"\n" + "="*60)
-    print("Starting Training (Fixed Version)")
+    print("Starting Training")
     print("="*60)
     
     start_time = time.time()
@@ -489,11 +511,11 @@ def main():
         
         avg_epoch_loss = train_epoch(
             dataloader_train, retinanet, optimizer, epoch, 
-            start_time, args.loss_threshold, scaler, args.use_amp
+            start_time, args.loss_threshold, scaler, args.use_amp, args.accumulate_steps
         )
         
         current_map = 0.0
-        if (epoch + 1) % args.eval_interval == 0 or epoch == args.epochs - 1:
+        if (epoch + 1) % args.eval_interval == 0 or epoch == args.epochs - 1 or epoch == 0:
             current_map = evaluate_epoch(retinanet, dataset_val, epoch, args.save_dir)
             
             if args.eval_coco:
@@ -535,7 +557,8 @@ def main():
                         'depth': args.depth,
                         'learning_rate': args.learning_rate,
                         'batch_size': args.batch_size,
-                        'loss_threshold': args.loss_threshold
+                        'loss_threshold': args.loss_threshold,
+                        'accumulate_steps': args.accumulate_steps
                     }
                 }
                 if scaler:
@@ -571,7 +594,8 @@ def main():
                     'depth': args.depth,
                     'learning_rate': args.learning_rate,
                     'batch_size': args.batch_size,
-                    'loss_threshold': args.loss_threshold
+                    'loss_threshold': args.loss_threshold,
+                    'accumulate_steps': args.accumulate_steps
                 }
             }
             if scaler:
@@ -593,7 +617,8 @@ def main():
             'depth': args.depth,
             'learning_rate': args.learning_rate,
             'batch_size': args.batch_size,
-            'loss_threshold': args.loss_threshold
+            'loss_threshold': args.loss_threshold,
+            'accumulate_steps': args.accumulate_steps
         }
     }
     if scaler:
