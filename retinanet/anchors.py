@@ -12,15 +12,27 @@ class Anchors(nn.Module): #手动设置每个特征图对应的anchor基础框�
         if strides is None:
             self.strides = [2 ** x for x in self.pyramid_levels] #特征图大小为 [原图大小/8, 原图大小/16, 原图大小/32, 原图大小/64, 原图大小/128]
         if sizes is None:
+            #self.sizes = [12, 20, 32, 52, 84]
+            #self.sizes = [10, 16, 24, 44, 72]
+            #self.sizes = [2, 4, 8, 16, 32]
             self.sizes = [4, 8, 16, 32, 64]
             #self.sizes = [2 ** (x + 2) for x in self.pyramid_levels] #base_size设置为：[32,64,128,256,512]
             #即对于长宽为（原图大小/8，原图大小/8）的特征图，其特征图上的每个单元格cell对应原图区域上（32，32）大小的对应区域（这里对应的大小并不是实际感受野的大小，而是一种人为的近似设置）。
 
         #那么在大小为base_size的正方形框的基础上，对框进行长宽比例调整（3 种，分别为[0.5, 1, 2]）和缩放（3种，分别为[2 ** 0, 2 ** (1.0 / 3.0), 2 ** (2.0 / 3.0)]），便形成9种所谓的基础框/先验框anchor。（体现在不同的channel数）
         if ratios is None:
-            self.ratios = np.array([0.5, 1, 2])
+            self.ratios = np.array([0.3, 1.0, 3.0])
+            #self.ratios = np.array([0.8, 1.2, 1.6])
+            #self.ratios = np.array([0.6, 1.0, 1.6])
+            #self.ratios = np.array([0.5, 1.0, 2.0])
+            #self.ratios = np.array([0.05, 1.0, 50])
+            #self.ratios = np.array([0.2, 1.0, 5])
+            #self.ratios = np.array([0.1, 1.0, 10])
         if scales is None:
-            self.scales = np.array([0.8, 1.0, 1.25])
+            #self.scales = np.array([0.8, 1.0, 1.6])
+            self.scales = np.array([1.0, 1.41, 2.0])
+            #self.scales = np.array([0.7, 1.0, 1.6])
+            #self.scales = np.array([0.8, 1.0, 1.25])
             #self.scales = np.array([2 ** 0, 2 ** (1.0 / 3.0), 2 ** (2.0 / 3.0)])
 
     #实现所有anchor生成的程序为：

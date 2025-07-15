@@ -293,10 +293,14 @@ def safe_training_step(retinanet, data, optimizer, iter_num, loss_threshold=50.0
 def train_epoch(dataloader, retinanet, optimizer, epoch_num, start_time, loss_threshold=50.0,
                scaler=None, use_amp=False, accumulate_steps=2):
     retinanet.train()
-    if hasattr(retinanet, 'freeze_bn'):
-        retinanet.freeze_bn()
-    elif hasattr(retinanet, 'module') and hasattr(retinanet.module, 'freeze_bn'):
-        retinanet.module.freeze_bn()
+    
+    # 处理DataParallel的freeze_bn
+    if hasattr(retinanet, 'module'):
+        if hasattr(retinanet.module, 'freeze_bn'):
+            retinanet.module.freeze_bn()
+    else:
+        if hasattr(retinanet, 'freeze_bn'):
+            retinanet.freeze_bn()
     
     loss_hist = collections.deque(maxlen=100)
     epoch_losses = []
@@ -466,6 +470,14 @@ def main():
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     if torch.cuda.is_available():
         retinanet = retinanet.cuda()
+        
+        # 使用DataParallel进行多GPU训练
+        if torch.cuda.device_count() > 1:
+            print(f"Using {torch.cuda.device_count()} GPUs for training")
+            retinanet = torch.nn.DataParallel(retinanet)
+        else:
+            print("Using single GPU")
+        
         print("Model moved to GPU")
     else:
         print("Using CPU")

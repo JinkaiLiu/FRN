@@ -87,8 +87,8 @@ class FocalLoss(nn.Module):
             if torch.cuda.is_available():
                 targets = targets.cuda()
 
-            targets[torch.lt(IoU_max, 0.4), :] = 0
-            positive_indices = torch.ge(IoU_max, 0.5)
+            targets[torch.lt(IoU_max, 0.3), :] = 0
+            positive_indices = torch.ge(IoU_max, 0.4)
 
             num_positive_anchors = positive_indices.sum()
 
@@ -167,5 +167,3 @@ class FocalLoss(nn.Module):
                     regression_losses.append(torch.tensor(0).float())
 
         return torch.stack(classification_losses).mean(dim=0, keepdim=True), torch.stack(regression_losses).mean(dim=0, keepdim=True)
-
-
