@@ -7,6 +7,7 @@ import torch
 import torch.optim as optim
 from torch.cuda.amp import autocast, GradScaler
 import os
+import glob
 from retinanet.dataloader_fast_combined import create_fast_dataloader as create_dsec_det_dataloader
 from retinanet import model
 from retinanet.csv_eval_dsec_det import evaluate, evaluate_coco_map
@@ -374,6 +375,138 @@ def evaluate_epoch(retinanet, dataset_val, epoch_num, save_folder):
     return mean_ap
 
 
+def find_latest_checkpoint(save_dir):
+    """Find the latest checkpoint file automatically"""
+    patterns = [
+        os.path.join(save_dir, 'dsec_retinanet_fixed_epoch_*.pt'),
+        os.path.join(save_dir, 'best_model_fixed.pt'),
+        os.path.join(save_dir, 'dsec_retinanet_fixed_final.pt')
+    ]
+    
+    all_checkpoints = []
+    for pattern in patterns:
+        all_checkpoints.extend(glob.glob(pattern))
+    
+    if not all_checkpoints:
+        return None
+    
+    # Return the most recently modified checkpoint
+    latest_checkpoint = max(all_checkpoints, key=os.path.getmtime)
+    return latest_checkpoint
+
+
+def load_checkpoint_robust(checkpoint_path, retinanet, optimizer, scheduler, scaler=None):
+    """Load checkpoint with enhanced error handling and state recovery"""
+    try:
+        print(f"Loading checkpoint: {checkpoint_path}")
+        checkpoint = torch.load(checkpoint_path, map_location='cpu')
+        
+        # Load model state
+        if hasattr(retinanet, 'module'):
+            retinanet.module.load_state_dict(checkpoint['model_state_dict'])
+        else:
+            retinanet.load_state_dict(checkpoint['model_state_dict'])
+        
+        # Load optimizer state
+        optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
+        
+        # Load scheduler state if available
+        if 'scheduler_state_dict' in checkpoint:
+            scheduler.load_state_dict(checkpoint['scheduler_state_dict'])
+            print("Scheduler state loaded successfully")
+        else:
+            print("Warning: No scheduler state found in checkpoint")
+        
+        # Load scaler state if using AMP
+        if scaler and 'scaler_state_dict' in checkpoint:
+            scaler.load_state_dict(checkpoint['scaler_state_dict'])
+            print("Scaler state loaded successfully")
+        
+        # Extract training metadata
+        start_epoch = checkpoint.get('epoch', 0) + 1  # Resume from next epoch
+        best_map = checkpoint.get('best_map', 0.0)
+        best_epoch = checkpoint.get('best_epoch', 0)
+        train_log = checkpoint.get('train_log', [])
+        
+        print(f"Checkpoint loaded successfully:")
+        print(f"  - Resume from epoch: {start_epoch}")
+        print(f"  - Best mAP: {best_map:.4f} (epoch {best_epoch})")
+        print(f"  - Training history entries: {len(train_log)}")
+        
+        return start_epoch, best_map, best_epoch, train_log
+        
+    except Exception as e:
+        print(f"Failed to load checkpoint: {e}")
+        print("Starting training from scratch...")
+        return 0, 0.0, 0, []
+
+
+def save_checkpoint_enhanced(save_path, epoch, retinanet, optimizer, scheduler, scaler,
+                           avg_epoch_loss, current_map, best_map, best_epoch, train_log, args):
+    """Save checkpoint with complete state information"""
+    save_dict = {
+        'epoch': epoch,
+        'model_state_dict': retinanet.state_dict() if not hasattr(retinanet, 'module') else retinanet.module.state_dict(),
+        'optimizer_state_dict': optimizer.state_dict(),
+        'scheduler_state_dict': scheduler.state_dict(),  # Save scheduler state
+        'loss': avg_epoch_loss,
+        'map': current_map,
+        'best_map': best_map,
+        'best_epoch': best_epoch,
+        'train_log': train_log,  # Preserve training history
+        'config': {
+            'fusion': args.fusion,
+            'depth': args.depth,
+            'learning_rate': args.learning_rate,
+            'batch_size': args.batch_size,
+            'loss_threshold': args.loss_threshold,
+            'accumulate_steps': args.accumulate_steps
+        }
+    }
+    
+    # Save scaler state if using AMP
+    if scaler:
+        save_dict['scaler_state_dict'] = scaler.state_dict()
+    
+    # Atomic save: write to temporary file first, then rename
+    temp_path = save_path + '.tmp'
+    torch.save(save_dict, temp_path)
+    os.rename(temp_path, save_path)
+    
+    print(f"Enhanced checkpoint saved: {save_path}")
+
+
+def auto_resume_training(args, retinanet, optimizer, scheduler, scaler=None):
+    """Automatically handle training resume with improved checkpoint detection"""
+    start_epoch = 0
+    best_map = 0.0
+    best_epoch = 0
+    train_log = []
+    
+    checkpoint_path = None
+    
+    if args.continue_training:
+        # Priority 1: Use specified checkpoint if provided and exists
+        if args.checkpoint and os.path.exists(args.checkpoint):
+            checkpoint_path = args.checkpoint
+            print(f"Using specified checkpoint: {checkpoint_path}")
+        # Priority 2: Auto-detect latest checkpoint in save directory
+        else:
+            checkpoint_path = find_latest_checkpoint(args.save_dir)
+            if checkpoint_path:
+                print(f"Auto-detected latest checkpoint: {checkpoint_path}")
+            else:
+                print("No checkpoint found for resume, starting from scratch")
+    
+    # Load checkpoint if found
+    if checkpoint_path:
+        start_epoch, best_map, best_epoch, train_log = load_checkpoint_robust(
+            checkpoint_path, retinanet, optimizer, scheduler, scaler
+        )
+    
+    return start_epoch, best_map, best_epoch, train_log
+
+
 def main():
     parser = argparse.ArgumentParser(description='DSEC Detection Training Script')
     
@@ -487,30 +620,10 @@ def main():
     
     scaler = GradScaler() if args.use_amp else None
     
-    best_map = 0.0
-    best_epoch = 0
-    
-    train_log = []
-    
-    start_epoch = 0
-    if args.continue_training and args.checkpoint:
-        print(f"\nLoading checkpoint: {args.checkpoint}")
-        try:
-            checkpoint = torch.load(args.checkpoint)
-            if hasattr(retinanet, 'module'):
-                retinanet.module.load_state_dict(checkpoint['model_state_dict'])
-            else:
-                retinanet.load_state_dict(checkpoint['model_state_dict'])
-            optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
-            if scaler and 'scaler_state_dict' in checkpoint:
-                scaler.load_state_dict(checkpoint['scaler_state_dict'])
-            start_epoch = checkpoint.get('epoch', 0)
-            best_map = checkpoint.get('best_map', 0.0)
-            best_epoch = checkpoint.get('best_epoch', 0)
-            print(f"Resumed from epoch {start_epoch}, best mAP: {best_map:.4f} (epoch {best_epoch})")
-        except Exception as e:
-            print(f"Failed to load checkpoint: {e}")
-            start_epoch = 0
+    # Enhanced checkpoint resume with auto-detection and complete state recovery
+    start_epoch, best_map, best_epoch, train_log = auto_resume_training(
+        args, retinanet, optimizer, scheduler, scaler
+    )
     
     print(f"\n" + "="*60)
     print("Starting Training")
@@ -556,29 +669,13 @@ def main():
                 print(f"🎉 New best mAP: {best_map:.4f} (epoch {best_epoch})")
                 
                 best_model_path = f'{args.save_dir}/best_model_fixed.pt'
-                save_dict = {
-                    'epoch': epoch,
-                    'model_state_dict': retinanet.state_dict() if not hasattr(retinanet, 'module') else retinanet.module.state_dict(),
-                    'optimizer_state_dict': optimizer.state_dict(),
-                    'loss': avg_epoch_loss,
-                    'map': current_map,
-                    'best_map': best_map,
-                    'best_epoch': best_epoch,
-                    'config': {
-                        'fusion': args.fusion,
-                        'depth': args.depth,
-                        'learning_rate': args.learning_rate,
-                        'batch_size': args.batch_size,
-                        'loss_threshold': args.loss_threshold,
-                        'accumulate_steps': args.accumulate_steps
-                    }
-                }
-                if scaler:
-                    save_dict['scaler_state_dict'] = scaler.state_dict()
-                
-                torch.save(save_dict, best_model_path)
+                save_checkpoint_enhanced(
+                    best_model_path, epoch, retinanet, optimizer, scheduler, scaler,
+                    avg_epoch_loss, current_map, best_map, best_epoch, train_log, args
+                )
                 print(f"Best model saved: {best_model_path}")
         
+        # Update training log with current epoch results
         train_log.append({
             'epoch': epoch,
             'loss': avg_epoch_loss,
@@ -590,53 +687,20 @@ def main():
         if avg_epoch_loss != float('inf'):
             scheduler.step(avg_epoch_loss)
         
+        # Save regular checkpoint every 5 epochs or at the end
         if epoch % 5 == 0 or epoch == args.epochs - 1:
             save_path = f'{args.save_dir}/dsec_retinanet_fixed_epoch_{epoch}.pt'
-            save_dict = {
-                'epoch': epoch,
-                'model_state_dict': retinanet.state_dict() if not hasattr(retinanet, 'module') else retinanet.module.state_dict(),
-                'optimizer_state_dict': optimizer.state_dict(),
-                'loss': avg_epoch_loss,
-                'map': current_map,
-                'best_map': best_map,
-                'best_epoch': best_epoch,
-                'train_log': train_log,
-                'config': {
-                    'fusion': args.fusion,
-                    'depth': args.depth,
-                    'learning_rate': args.learning_rate,
-                    'batch_size': args.batch_size,
-                    'loss_threshold': args.loss_threshold,
-                    'accumulate_steps': args.accumulate_steps
-                }
-            }
-            if scaler:
-                save_dict['scaler_state_dict'] = scaler.state_dict()
-            
-            torch.save(save_dict, save_path)
-            print(f"Model saved: {save_path}")
+            save_checkpoint_enhanced(
+                save_path, epoch, retinanet, optimizer, scheduler, scaler,
+                avg_epoch_loss, current_map, best_map, best_epoch, train_log, args
+            )
     
+    # Save final model with complete training information
     final_path = f'{args.save_dir}/dsec_retinanet_fixed_final.pt'
-    final_dict = {
-        'epoch': args.epochs,
-        'model_state_dict': retinanet.state_dict() if not hasattr(retinanet, 'module') else retinanet.module.state_dict(),
-        'optimizer_state_dict': optimizer.state_dict(),
-        'train_log': train_log,
-        'best_map': best_map,
-        'best_epoch': best_epoch,
-        'config': {
-            'fusion': args.fusion,
-            'depth': args.depth,
-            'learning_rate': args.learning_rate,
-            'batch_size': args.batch_size,
-            'loss_threshold': args.loss_threshold,
-            'accumulate_steps': args.accumulate_steps
-        }
-    }
-    if scaler:
-        final_dict['scaler_state_dict'] = scaler.state_dict()
-    
-    torch.save(final_dict, final_path)
+    save_checkpoint_enhanced(
+        final_path, args.epochs, retinanet, optimizer, scheduler, scaler,
+        avg_epoch_loss, current_map, best_map, best_epoch, train_log, args
+    )
     
     total_time = time_since(start_time)
     print(f"\n" + "="*60)
