@@ -223,7 +223,7 @@ def create_fast_dataloader(root_dir, split='train', batch_size=4, num_workers=4,
         collate_fn=collate_fn,
         pin_memory=torch.cuda.is_available(),
         drop_last=(split == 'train'),
-        persistent_workers=False
+        persistent_workers=True
     )
     
     print(f"[DEBUG] DataLoader created successfully")
